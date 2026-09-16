@@ -1,0 +1,6 @@
+/node_modules
+/uploads
+/scripts
+/config/config.json
+/.env
+/build
