@@ -11,29 +11,30 @@ const ROLE_TYPE_CODES = Object.freeze([
 const getRoleType = (key) => ROLE_TYPE_CODES.find((item) => item.key === key);
 
 
-const ERROR_CODES = Object.freeze([
+const MESSAGE_CODES = Object.freeze([
   { key: "AUTH_TOKEN_MISSING", value: "100001", label: "Your request is not authorized please provide a valid token" },
-  { key: "AUTH_USER_NOT_FOUND", value: "100002", label: "Your request is not authorized please provide a valid token" },
-  { key: "AUTH_NOT_PLATFORM_ROLE", value: "100003", label: "Your request is not authorized please provide a valid token" },
-  { key: "AUTH_ROLE_INACTIVE", value: "100004", label: "Your role is not active please contact admin" },
-  { key: "AUTH_ORG_INACTIVE", value: "100005", label: "Your organization is not active please contact admin" },
-  { key: "AUTH_MEMBERSHIP_INACTIVE", value: "100006", label: "Your membership is not active please contact admin" },
-  { key: "AUTH_ACCOUNT_INACTIVE", value: "100007", label: "Your account is not active please contact admin" },
-  { key: "AUTH_TOKEN_INVALID", value: "100008", label: "Your request is not authorized please provide a valid token" },
+  { key: "AUTH_USER_NOT_FOUND", value: "100002", label: "User not found" },
+  { key: "AUTH_NOT_PLATFORM_ROLE", value: "100003", label: "You are not authorized to access this platform" },
+  { key: "AUTH_USER_NOT_ACTIVE", value: "100004", label: "Your account is not active please contact admin" },
+  { key: "AUTH_ROLE_NOT_ACTIVE", value: "100005", label: "Your role is not active please contact admin" },
+  { key: "AUTH_ORG_NOT_ACTIVE", value: "100006", label: "Your organization is not active please contact admin" },
+  { key: "AUTH_MEMBERSHIP_NOT_ACTIVE", value: "100007", label: "Your membership is not active please contact admin" },
+  { key: "AUTH_ACCOUNT_NOT_ACTIVE", value: "100008", label: "Your account is not active please contact admin" },
+  { key: "AUTH_TOKEN_INVALID", value: "100009", label: "Your request is not authorized please provide a valid token" },
+  { key: "AUTH_INVALID_PASSWORD", value: "100010", label: "Invalid password" },
 ]);
 
-const getErrorCode = (key) => ERROR_CODES.find((item) => item.key === key);
+const getMessageCode = (key) => MESSAGE_CODES.find((item) => item.key === key);
 
 
 const errorResponse = (key, data) => {
-  const err = getErrorCode(key);
-  const body = { status: false, error_code: err.value, message: err.label };
+  const err = getMessageCode(key);
+  const body = { status: 0, error_code: err.value, message: err.label };
   if (data !== undefined) body.data = data;
   return body;
 };
 const successResponse = (data, message) => {
-  const body = { status: true };
-  if (message) body.message = message;
+  const body = { status: 1, message: message };
   if (data !== undefined) body.data = data;
   return body;
 };
@@ -41,8 +42,8 @@ const successResponse = (data, message) => {
 export {
   ROLE_TYPE_CODES,
   getRoleType,
-  ERROR_CODES,
-  getErrorCode,
+  MESSAGE_CODES,
+  getMessageCode,
   errorResponse,
   successResponse,
 };

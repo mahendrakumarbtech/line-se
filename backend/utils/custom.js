@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import models from "../models/index.js";
+import { compare } from "bcryptjs";
+import { ROLE_TYPE_CODES, errorResponse, successResponse } from "../../constants.mjs";
 const CACHE_TTL = 5 * 60 * 1000;
 
 const USER_SENSITIVE_FIELDS = ["password"];
@@ -10,6 +12,10 @@ const signToken = (payload) =>
 
 const verifyToken = (token) =>
 	jwt.verify(token, process.env.JWT_SECRET);
+
+const comparePassword = async (password, hashedPassword) => {
+	return await compare(password, hashedPassword);
+};
 
 
 const store = new Map();
@@ -147,11 +153,35 @@ const getAdminAuthUser = async (userId) => {
 		email: user.email,
 		status: user.status,
 		role: { id: role?.id, name: role?.name ?? null, role_type: role?.role_type ?? null, status: role?.status ?? 0 },
-		permissions: (user.role?.Permissions || []).map((p) => p.slug),
+		permissions: (role?.Permissions || []).map((p) => p.slug),
 	};
 	cacheSet(key, result, CACHE_TTL);
 	return result;
 };
+
+
+async function adminAuthValidate(userId) {
+    const PLATFORM_ROLES = ROLE_TYPE_CODES
+        .filter((r) => r.panel === "admin")
+        .map((r) => r.value);
+
+    const adminAuthUser = await getAdminAuthUser(userId);
+    if (!adminAuthUser) return errorResponse("AUTH_NOT_PLATFORM_ROLE");
+
+    if (adminAuthUser.role?.status !== 1) {
+        return errorResponse("AUTH_ROLE_NOT_ACTIVE");
+    }
+
+    if (!PLATFORM_ROLES.includes(adminAuthUser.role?.role_type)) {
+        return errorResponse("AUTH_NOT_PLATFORM_ROLE");
+    }
+
+	if (adminAuthUser.status !== 1) {
+		return errorResponse("AUTH_USER_NOT_ACTIVE");
+	}
+
+    return successResponse(adminAuthUser, "Authentication successful");
+}
 
 const getUserWithPermissions = async (userId, roleId, organizationId) => {
 	const key = `auth:${userId}:${organizationId ?? "platform"}`;
@@ -211,12 +241,14 @@ const getUserWithPermissions = async (userId, roleId, organizationId) => {
 
 
 export {
+	signToken,
+	verifyToken,
+	comparePassword,
 	cacheGet,
 	cacheSet,
 	cacheDel,
 	cacheDelByPrefix,
 	getAdminAuthUser,
+	adminAuthValidate,
 	getUserWithPermissions,
-	signToken,
-	verifyToken,
 }

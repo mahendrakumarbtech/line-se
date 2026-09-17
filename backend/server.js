@@ -2,8 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import sequelize from "./config/database.js";
 import models from "./models/index.js";
+import adminAuthRoutes from "./routes/admin/auth.routes.js";
 
 const app = express();
 
@@ -20,6 +20,8 @@ app.get("/api/health", (req, res) => {
         message: "Queue Management API is running",
     });
 });
+
+app.use("/api/admin", adminAuthRoutes);
 
 const PORT = process.env.PORT || 5000;
 
