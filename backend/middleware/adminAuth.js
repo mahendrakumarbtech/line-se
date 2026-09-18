@@ -1,7 +1,7 @@
 import { verifyToken, adminAuthValidate } from "../utils/custom.js";
 import { errorResponse } from "../../constants.mjs";
 
-export default async function AdminAuth(req, res, next) {
+async function adminAuth(req, res, next) {
 
     try {
         const header = req.headers.authorization;
@@ -21,3 +21,5 @@ export default async function AdminAuth(req, res, next) {
         return res.status(401).json(errorResponse("AUTH_TOKEN_INVALID"));
     }
 }
+
+export { adminAuth };

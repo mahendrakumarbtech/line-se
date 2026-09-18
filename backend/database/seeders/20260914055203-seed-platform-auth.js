@@ -1,20 +1,6 @@
 import bcrypt from "bcryptjs";
-import { ROLE_TYPE_CODES, getRoleType } from "../../../constants.mjs";
+import { ROLE_TYPE_CODES, getRoleType, ADMIN_PERMISSIONS } from "../../../constants.mjs";
 
-const PERMISSIONS = [
-  { name: "View Organizations", slug: "organization.view", module: "organization" },
-  { name: "Create Organization", slug: "organization.create", module: "organization" },
-  { name: "Update Organization", slug: "organization.update", module: "organization" },
-  { name: "Delete Organization", slug: "organization.delete", module: "organization" },
-  { name: "View Users", slug: "user.view", module: "user" },
-  { name: "Create User", slug: "user.create", module: "user" },
-  { name: "Update User", slug: "user.update", module: "user" },
-  { name: "Delete User", slug: "user.delete", module: "user" },
-  { name: "View Roles", slug: "role.view", module: "role" },
-  { name: "Create Role", slug: "role.create", module: "role" },
-  { name: "Update Role", slug: "role.update", module: "role" },
-  { name: "Delete Role", slug: "role.delete", module: "role" },
-];
 
 const SUPER_ADMIN_EMAIL = "admin@linese.com";
 
@@ -24,7 +10,7 @@ export default {
 
     await queryInterface.bulkInsert(
       "permissions",
-      PERMISSIONS.map((p) => ({ ...p, status: 1, created_at: now, updated_at: now }))
+      ADMIN_PERMISSIONS.map((p) => ({ ...p, status: 1, created_at: now, updated_at: now }))
     );
 
     await queryInterface.bulkInsert(

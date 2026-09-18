@@ -22,10 +22,34 @@ const MESSAGE_CODES = Object.freeze([
   { key: "AUTH_ACCOUNT_NOT_ACTIVE", value: "100008", label: "Your account is not active please contact admin" },
   { key: "AUTH_TOKEN_INVALID", value: "100009", label: "Your request is not authorized please provide a valid token" },
   { key: "AUTH_INVALID_PASSWORD", value: "100010", label: "Invalid password" },
+  { key: "AUTH_PERMISSION_DENIED", value: "100011", label: "You do not have permission to perform this action" },
+  { key: "ORG_NOT_FOUND", value: "300001", label: "Organization not found" },
+  { key: "ORG_SLUG_EXISTS", value: "300002", label: "Organization slug already exists" },
+  { key: "ORG_CREATE_FAILED", value: "300003", label: "Failed to create organization" },
+  { key: "ORG_VALIDATION_FAILED", value: "300004", label: "Validation failed" },
+  { key: "ORG_NAME_REQUIRED", value: "300005", label: "Name is required" },
+  { key: "ORG_SLUG_REQUIRED", value: "300006", label: "Slug is required" },
+  { key: "ORG_TYPE_REQUIRED", value: "300007", label: "Type is required" },
+  { key: "ORG_LIST_FAILED", value: "300008", label: "Failed to list organizations" },
 ]);
 
 const getMessageCode = (key) => MESSAGE_CODES.find((item) => item.key === key);
 
+
+const ADMIN_PERMISSIONS = [
+  { name: "View Organizations", slug: "organization.view", module: "organization" },
+  { name: "Create Organization", slug: "organization.create", module: "organization" },
+  { name: "Update Organization", slug: "organization.update", module: "organization" },
+  { name: "Delete Organization", slug: "organization.delete", module: "organization" },
+  { name: "View Users", slug: "user.view", module: "user" },
+  { name: "Create User", slug: "user.create", module: "user" },
+  { name: "Update User", slug: "user.update", module: "user" },
+  { name: "Delete User", slug: "user.delete", module: "user" },
+  { name: "View Roles", slug: "role.view", module: "role" },
+  { name: "Create Role", slug: "role.create", module: "role" },
+  { name: "Update Role", slug: "role.update", module: "role" },
+  { name: "Delete Role", slug: "role.delete", module: "role" },
+];
 
 const errorResponse = (key, data) => {
   const err = getMessageCode(key);
@@ -39,12 +63,43 @@ const successResponse = (data, message) => {
   return body;
 };
 
+const canAccess = (userOrKeys, permission) => {
+  const key = String(permission || "").trim();
+  if (!key) return false;
+  if (Array.isArray(userOrKeys)) {
+    return userOrKeys.includes(key) || userOrKeys.includes("*");
+  }
+  if (!userOrKeys || typeof userOrKeys !== "object") return false;
+  const roleType = userOrKeys.role?.role_type ?? null;
+  if (roleType === getRoleType("SUPER_ADMIN")?.value) return true;
+  const keys = userOrKeys.permissions || [];
+  if (!Array.isArray(keys) || !keys.length) return false;
+  if (keys.includes("*")) return true;
+  return keys.includes(key);
+};
+
+/** True if the user can perform any of the given permissions. */
+function canAccessAny(userOrKeys, permissions) {
+  if (!Array.isArray(permissions) || !permissions.length) return false;
+  return permissions.some((p) => canAccess(userOrKeys, p));
+}
+
+/** True if the user can perform all of the given permissions. */
+function canAccessAll(userOrKeys, permissions) {
+  if (!Array.isArray(permissions) || !permissions.length) return false;
+  return permissions.every((p) => canAccess(userOrKeys, p));
+}
+
 export {
   ROLE_TYPE_CODES,
   getRoleType,
   MESSAGE_CODES,
   getMessageCode,
+  ADMIN_PERMISSIONS,
   errorResponse,
   successResponse,
+  canAccess,
+  canAccessAny,
+  canAccessAll,
 };
 
