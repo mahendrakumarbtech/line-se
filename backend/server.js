@@ -3,8 +3,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import models from "./models/index.js";
-import adminAuthRoutes from "./routes/admin/auth.routes.js";
-import organizationRoutes from "./routes/admin/organization.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 
@@ -22,8 +21,7 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-app.use("/api/admin", adminAuthRoutes);
-app.use("/api/admin/organizations", organizationRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 
