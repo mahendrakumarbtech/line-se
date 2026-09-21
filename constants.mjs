@@ -31,6 +31,11 @@ const MESSAGE_CODES = Object.freeze([
   { key: "ORG_SLUG_REQUIRED", value: "300006", label: "Slug is required" },
   { key: "ORG_TYPE_REQUIRED", value: "300007", label: "Type is required" },
   { key: "ORG_LIST_FAILED", value: "300008", label: "Failed to list organizations" },
+  { key: "ORG_ID_REQUIRED", value: "300009", label: "Organization id is required" },
+  { key: "ORG_UPDATE_FAILED", value: "300010", label: "Failed to update organization" },
+  { key: "ORG_DELETE_FAILED", value: "300011", label: "Failed to delete organization" },
+  { key: "ORG_IDS_REQUIRED", value: "300012", label: "Organization ids are required" },
+  { key: "ORG_STATUS_REQUIRED", value: "300013", label: "Status is required" },
 ]);
 
 const getMessageCode = (key) => MESSAGE_CODES.find((item) => item.key === key);

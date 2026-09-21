@@ -77,6 +77,7 @@ export default (sequelize, DataTypes) => {
       tableName: "organizations",
       timestamps: true,
       underscored: true,
+      paranoid: true,
     }
   );
 
