@@ -238,8 +238,6 @@ const getUserWithPermissions = async (userId, roleId, organizationId) => {
 	return result;
 };
 
-
-
 export {
 	signToken,
 	verifyToken,

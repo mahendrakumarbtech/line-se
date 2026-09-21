@@ -21,11 +21,18 @@ async function adminLogin(req, res) {
     return res.status(200).json(successResponse({ token, user: validated.data }, "Login successful"));
 }
 
-async function me(req, res) {
+async function dashboard(req, res) {
     return res.status(200).json(successResponse(req.authUser));
+}
+
+async function adminRegister(req, res) {
+    const { name, email, password } = req.body;
+    const user = await models.User.create({ name, email, password });
+    return res.status(200).json(successResponse(user));
 }
 
 export {
     adminLogin,
-    me
+    dashboard,
+    adminRegister
 };

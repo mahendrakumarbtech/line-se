@@ -37,6 +37,7 @@ const getMessageCode = (key) => MESSAGE_CODES.find((item) => item.key === key);
 
 
 const ADMIN_PERMISSIONS = [
+  { name: "View Dashboard", slug: "dashboard.view", module: "dashboard" },
   { name: "View Organizations", slug: "organization.view", module: "organization" },
   { name: "Create Organization", slug: "organization.create", module: "organization" },
   { name: "Update Organization", slug: "organization.update", module: "organization" },
@@ -72,14 +73,23 @@ const successResponse = (data, message) => {
 const canAccess = (userOrKeys, permission) => {
   const key = String(permission || "").trim();
   if (!key) return false;
+
+  // Har authenticated admin ke liye dashboard open
+  if (key === "dashboard.view") return true;
+
+  // Har authenticated admin ke liye dashboard open
   if (Array.isArray(userOrKeys)) {
     return userOrKeys.includes(key) || userOrKeys.includes("*");
   }
+
   if (!userOrKeys || typeof userOrKeys !== "object") return false;
+
   const roleType = userOrKeys.role?.role_type ?? null;
   if (roleType === getRoleType("SUPER_ADMIN")?.value) return true;
+
   const keys = userOrKeys.permissions || [];
   if (!Array.isArray(keys) || !keys.length) return false;
+
   if (keys.includes("*")) return true;
   return keys.includes(key);
 };

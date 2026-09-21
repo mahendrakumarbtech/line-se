@@ -1,7 +1,7 @@
 import { errorResponse, successResponse, getMessageCode } from "../../../constants.mjs";
 import models from "../../models/index.js";
 
-async function list(req, res) {
+async function index(req, res) {
     const { filter = {}, page = 1, limit = 10 } = req.body;
     const offset = (page - 1) * limit;
     try {
@@ -24,7 +24,7 @@ async function list(req, res) {
     }
 }
 
-async function create(req, res) {
+async function add(req, res) {
   const { name, slug, type, status } = req.body;
   const errors = {};
 
@@ -53,4 +53,4 @@ async function create(req, res) {
   }
 }
 
-export { list, create };
+export { index, add };
