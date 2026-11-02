@@ -1,5 +1,5 @@
 import { verifyToken, adminAuthValidate } from "../utils/custom.js";
-import { errorResponse } from "../../constants.mjs";
+import { errorResponse } from "../../frontend/constants.mjs";
 
 async function adminAuth(req, res, next) {
 

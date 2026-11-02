@@ -1,4 +1,4 @@
-import { errorResponse, successResponse, getMessageCode } from "../../../constants.mjs";
+import { errorResponse, successResponse, getMessageCode } from "../../../frontend/constants.mjs";
 import models from "../../models/index.js";
 
 async function index(req, res) {

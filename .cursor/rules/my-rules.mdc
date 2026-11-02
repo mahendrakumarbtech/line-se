@@ -1,0 +1,69 @@
+---
+description: Function, cache, API response, and auth rules for line-se
+alwaysApply: true
+---
+
+# Function rules
+
+Har naya function isi pattern pe likho.
+
+## Returns (JS)
+
+- PHP Sonar single-return yahan apply mat karo. JS me **early return / guard clause** use karo.
+- DB/cache helpers (`getUserDetails`, `getAdminAuthUser`) fail pe **`null`**. `{}` / partial mat return karo.
+- `null` cache mat karo. Cache sirf complete valid object.
+
+```js
+const doWork = async (id) => {
+  const row = await find(id);
+  if (!row || row.status !== 1) return null;
+
+  const result = { id: row.id, name: row.name };
+  cacheSet(key, result);
+  return result;
+};
+```
+
+## API response
+
+- Envelope: `{ status, message?, data?, error_code? }`. `success` field mat use karo.
+- **`status` number hai, boolean nahi** — taaki baad me `2`, `3`, `4` bhi bhej sako.
+  - Fail: `status: 0` (+ `error_code`, `message`)
+  - Success: `status: 1` (+ optional `message`, `data`)
+  - Future: `2+` reserved
+- Fail: `errorResponse(key, data?)` → `{ status: 0, error_code, message, data? }`
+- Success: `successResponse(data, message?)` → `{ status: 1, message?, data? }`. Success pe `error_code` nahi.
+- Codes sirf `constants.mjs` `MESSAGE_CODES` + `getMessageCode(key)` / `errorResponse(key)`. File me `"100001"` string mat likho.
+- Ranges: auth `10xxxx`, users `20xxxx`, orgs `30xxxx`. Same meaning = same `key`.
+- `res.status(401).json(errorResponse("AUTH_TOKEN_MISSING"))` — HTTP code alag; body `status` number alag. DB `user.status` se mix mat karo.
+- Controllers hamesha `res.status(...).json(...)` — bare `return errorResponse(...)` mat.
+- DB/cache helpers fail pe **`null`**, envelope nahi.
+
+## Permissions (`can`)
+
+- Helper: `can(userOrKeys, permission)` — call: `can(req.authUser, "organization.view")`.
+- Super Admin (unrestricted `role_type`) → hamesha `true` (permission table se nahi).
+- Staff → `user.permissions` me slug / `*` check. Nested: `user.role?.role_type` bhi padho.
+- Array of keys bhi: `can(["organization.view"], "organization.view")`.
+- `requirePermission` thin middleware; gate `can(...)` se.
+
+## Cache
+
+- Keys: `user:{id}`, `organization:{id}`, `membership:{userId}:{orgId}`, `admin_auth:{userId}`, `auth:{userId}:{orgId|platform}`.
+- Cache **id / membership pair** par. `findAll` / search / filter cache mat karo.
+- Sequelize list pe `order` use karo, `orderBy` nahi.
+- User/role/permission/membership update par related keys delete (`cacheDel` / `cacheDelByPrefix`).
+- Memory `Map` abhi theek; Redis baad me — key names mat badalna.
+
+## Constants
+
+- Shared values sirf root `constants.mjs`.
+- Ek array: `{ key, value, label, badgeClass?, panel? }` + `getX(key)` helper. Duplicate object mat banao.
+- Customer `ROLE_TYPE_CODES` me nahi. Super Admin permission table se nahi — gate `role_type` / `can()` se.
+
+## Auth middleware
+
+- `AdminAuth` = platform panel. Sirf `panel === "admin"` (`SUPER_ADMIN` + `SUPER_ADMIN_STAFF`).
+- Token verify → `adminAuthValidate` → `req.authUser`. Email Super Admin check nahi — `role_type` se.
+- JWT: `{ user_id }`. `adminAuthValidate` me token mat banao — token sirf login pe.
+- Fail body: `errorResponse("AUTH_...")` from `constants.mjs`.

@@ -1,4 +1,4 @@
-import { canAccess, canAccessAny, errorResponse } from "../../constants.mjs";
+import { canAccess, canAccessAny, errorResponse } from "../../frontend/constants.mjs";
 /**
  * Laravel-style permission gate for Express routes.
  *

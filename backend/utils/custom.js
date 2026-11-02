@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import models from "../models/index.js";
 import { compare } from "bcryptjs";
-import { ROLE_TYPE_CODES, errorResponse, successResponse } from "../../constants.mjs";
+import { ROLE_TYPE_CODES, errorResponse, successResponse } from "../../frontend/constants.mjs";
 const CACHE_TTL = 5 * 60 * 1000;
 
 const USER_SENSITIVE_FIELDS = ["password"];

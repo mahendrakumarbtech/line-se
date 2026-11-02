@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { ROLE_TYPE_CODES, getRoleType, ADMIN_PERMISSIONS } from "../../../constants.mjs";
+import { ROLE_TYPE_CODES, getRoleType, ADMIN_PERMISSIONS } from "../../../frontend/constants.mjs";
 
 
 const SUPER_ADMIN_EMAIL = "admin@linese.com";
