@@ -29,7 +29,7 @@ dist-ssr
 /scripts
 .env
 /build
-work.txt
+.env.work
 .cursor
 backend/cli/cache/
 backend/logs/
