@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { errorResponse, successResponse, getMessageCode, LIMIT_PER_PAGE } from "../../../frontend/constants.mjs";
+import { errorResponse, successResponse, getMessageCode, LIMIT_PER_PAGE, canAccess } from "../../utils/custom.js";
 import models from "../../models/index.js";
 
 async function index(req, res) {
@@ -25,8 +25,11 @@ async function index(req, res) {
     };
 
     if (filter.trashed) {
+      if (!canAccess(req.authUser, "organization.manage-delete")) {
+        return res.status(403).json(errorResponse("AUTH_PERMISSION_DENIED"));
+      }
       query.paranoid = false;
-      where.deleted_at = { [Op.ne]: null };
+      where.deletedAt = { [Op.ne]: null };
     }
 
     const { count, rows } = await models.Organization.findAndCountAll(query);

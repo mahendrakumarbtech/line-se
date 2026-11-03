@@ -1,6 +1,5 @@
 import models from "../../models/index.js";
-import { adminAuthValidate, comparePassword, signToken } from "../../utils/custom.js";
-import { errorResponse, successResponse } from "../../../frontend/constants.mjs";
+import { adminAuthValidate, comparePassword, signToken, errorResponse, successResponse } from "../../utils/custom.js";
 
 
 async function adminLogin(req, res) {

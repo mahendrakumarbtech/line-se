@@ -1,7 +1,19 @@
 import jwt from "jsonwebtoken";
 import models from "../models/index.js";
 import { compare } from "bcryptjs";
-import { ROLE_TYPE_CODES, errorResponse, successResponse } from "../../frontend/constants.mjs";
+import {
+	ROLE_TYPE_CODES,
+	getRoleType,
+	MESSAGE_CODES,
+	getMessageCode,
+	ADMIN_PERMISSIONS,
+	errorResponse,
+	successResponse,
+	canAccess,
+	canAccessAny,
+	canAccessAll,
+	LIMIT_PER_PAGE,
+} from "../../constants.mjs";
 const CACHE_TTL = 5 * 60 * 1000;
 
 const USER_SENSITIVE_FIELDS = ["password"];
@@ -161,26 +173,26 @@ const getAdminAuthUser = async (userId) => {
 
 
 async function adminAuthValidate(userId) {
-    const PLATFORM_ROLES = ROLE_TYPE_CODES
-        .filter((r) => r.panel === "admin")
-        .map((r) => r.value);
+	const PLATFORM_ROLES = ROLE_TYPE_CODES
+		.filter((r) => r.panel === "admin")
+		.map((r) => r.value);
 
-    const adminAuthUser = await getAdminAuthUser(userId);
-    if (!adminAuthUser) return errorResponse("AUTH_NOT_PLATFORM_ROLE");
+	const adminAuthUser = await getAdminAuthUser(userId);
+	if (!adminAuthUser) return errorResponse("AUTH_NOT_PLATFORM_ROLE");
 
-    if (adminAuthUser.role?.status !== 1) {
-        return errorResponse("AUTH_ROLE_NOT_ACTIVE");
-    }
+	if (adminAuthUser.role?.status !== 1) {
+		return errorResponse("AUTH_ROLE_NOT_ACTIVE");
+	}
 
-    if (!PLATFORM_ROLES.includes(adminAuthUser.role?.role_type)) {
-        return errorResponse("AUTH_NOT_PLATFORM_ROLE");
-    }
+	if (!PLATFORM_ROLES.includes(adminAuthUser.role?.role_type)) {
+		return errorResponse("AUTH_NOT_PLATFORM_ROLE");
+	}
 
 	if (adminAuthUser.status !== 1) {
 		return errorResponse("AUTH_USER_NOT_ACTIVE");
 	}
 
-    return successResponse(adminAuthUser, "Authentication successful");
+	return successResponse(adminAuthUser, "Authentication successful");
 }
 
 const getUserWithPermissions = async (userId, roleId, organizationId) => {
@@ -239,6 +251,19 @@ const getUserWithPermissions = async (userId, roleId, organizationId) => {
 };
 
 export {
+	// constants re-export
+	ROLE_TYPE_CODES,
+	getRoleType,
+	MESSAGE_CODES,
+	getMessageCode,
+	ADMIN_PERMISSIONS,
+	errorResponse,
+	successResponse,
+	canAccess,
+	canAccessAny,
+	canAccessAll,
+	LIMIT_PER_PAGE,
+	// helpers
 	signToken,
 	verifyToken,
 	comparePassword,
