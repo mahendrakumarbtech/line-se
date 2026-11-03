@@ -17,9 +17,9 @@ export default {
       latitude: { type: Sequelize.DECIMAL(10, 8), allowNull: true },
       longitude: { type: Sequelize.DECIMAL(11, 8), allowNull: true },
       status: { type: Sequelize.INTEGER, defaultValue: 0 },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
-      deleted_at: { type: Sequelize.DATE, allowNull: true },
     });
   },
 

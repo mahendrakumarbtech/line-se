@@ -14,9 +14,9 @@ export default {
       name: { type: Sequelize.STRING, allowNull: false },
       role_type: { type: Sequelize.INTEGER, allowNull: false },
       status: { type: Sequelize.INTEGER, defaultValue: 1 },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
-      deleted_at: { type: Sequelize.DATE, allowNull: true },
     });
   },
 

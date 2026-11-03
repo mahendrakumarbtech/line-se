@@ -4,8 +4,8 @@ import cors from "cors";
 import helmet from "helmet";
 import models from "./models/index.js";
 import adminRoutes from "./routes/admin.routes.js";
-import apiRoutes from "./routes/api.routes.js";
-import frontendRoutes from "./routes/frontend.routes.js";
+import appRoutes from "./routes/app.routes.js";
+import webRoutes from "./routes/web.routes.js";
 
 const app = express();
 
@@ -24,8 +24,8 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/admin", adminRoutes);
-app.use("/api/api", apiRoutes);
-app.use("/api/frontend", frontendRoutes);
+app.use("/api/app", appRoutes);
+app.use("/api/web", webRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -1,3 +1,5 @@
+const LIMIT_PER_PAGE = 10;
+
 const ROLE_TYPE_CODES = Object.freeze([
   { key: "SUPER_ADMIN", value: 1, panel: "admin", label: "Super Admin", badgeClass: "badge rounded-pill bg-light-success" },
   { key: "SUPER_ADMIN_STAFF", value: 2, panel: "admin", label: "Super Admin Staff", badgeClass: "badge rounded-pill bg-light-warning" },
@@ -36,6 +38,7 @@ const MESSAGE_CODES = Object.freeze([
   { key: "ORG_DELETE_FAILED", value: "300011", label: "Failed to delete organization" },
   { key: "ORG_IDS_REQUIRED", value: "300012", label: "Organization ids are required" },
   { key: "ORG_STATUS_REQUIRED", value: "300013", label: "Status is required" },
+  { key: "ORG_BULK_DELETE_FAILED", value: "300014", label: "Failed to bulk delete organizations" },
 ]);
 
 const getMessageCode = (key) => MESSAGE_CODES.find((item) => item.key === key);
@@ -47,19 +50,19 @@ const ADMIN_PERMISSIONS = [
   { name: "Create Organization", slug: "organization.create", module: "organization" },
   { name: "Update Organization", slug: "organization.update", module: "organization" },
   { name: "Delete Organization", slug: "organization.delete", module: "organization" },
-  { name: "Force Delete Organization", slug: "organization.force-delete", module: "organization" },
+  { name: "Manage Deleted Organizations", slug: "organization.manage-delete", module: "organization" },
   { name: "Change Organization Status", slug: "organization.change-status", module: "organization" },
   { name: "View Users", slug: "user.view", module: "user" },
   { name: "Create User", slug: "user.create", module: "user" },
   { name: "Update User", slug: "user.update", module: "user" },
   { name: "Delete User", slug: "user.delete", module: "user" },
-  { name: "Force Delete User", slug: "user.force-delete", module: "user" },
+  { name: "Manage Deleted Users", slug: "user.manage-delete", module: "user" },
   { name: "Change User Status", slug: "user.change-status", module: "user" },
   { name: "View Roles", slug: "role.view", module: "role" },
   { name: "Create Role", slug: "role.create", module: "role" },
   { name: "Update Role", slug: "role.update", module: "role" },
   { name: "Delete Role", slug: "role.delete", module: "role" },
-  { name: "Force Delete Role", slug: "role.force-delete", module: "role" },
+  { name: "Manage Deleted Roles", slug: "role.manage-delete", module: "role" },
   { name: "Change Role Status", slug: "role.change-status", module: "role" },
 ];
 
@@ -122,5 +125,6 @@ export {
   canAccess,
   canAccessAny,
   canAccessAll,
+  LIMIT_PER_PAGE,
 };
 

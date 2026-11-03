@@ -2,7 +2,8 @@ import bcrypt from "bcryptjs";
 import { ROLE_TYPE_CODES, getRoleType, ADMIN_PERMISSIONS } from "../../../frontend/constants.mjs";
 
 
-const SUPER_ADMIN_EMAIL = "admin@linese.com";
+const SUPER_ADMIN_EMAIL = "lineseadmin@mailinator.com";
+const SUPER_ADMIN_PASSWORD = "Admin@123";
 
 export default {
   async up(queryInterface) {
@@ -25,7 +26,7 @@ export default {
       }))
     );
 
-    const password = await bcrypt.hash("Admin@123", 10);
+    const password = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 10);
 
     await queryInterface.bulkInsert("users", [
       {
