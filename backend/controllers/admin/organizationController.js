@@ -29,7 +29,7 @@ async function index(req, res) {
         return res.status(403).json(errorResponse("AUTH_PERMISSION_DENIED"));
       }
       query.paranoid = false;
-      where.deletedAt = { [Op.ne]: null };
+      where.deleted_at = { [Op.ne]: null };
     }
 
     const { count, rows } = await models.Organization.findAndCountAll(query);

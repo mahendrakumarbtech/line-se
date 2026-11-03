@@ -5,6 +5,7 @@ import { adminPermission } from "../middleware/adminPermission.js";
 import { resourceRoute } from "../utils/routeHelper.js";
 import { adminLogin, adminRegister, dashboard } from "../controllers/admin/authController.js";
 import * as OrganizationController from "../controllers/admin/organizationController.js";
+import * as UserController from "../controllers/admin/userController.js";
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.use(adminAuth);
 router.post("/dashboard", adminPermission("dashboard.view"), dashboard);
 
 resourceRoute(router, { prefix: "organizations", permission: "organization", controller: OrganizationController });
-// resourceRoute(router, { prefix: "users", permission: "user", controller: UserController });
+resourceRoute(router, { prefix: "users", permission: "user", controller: UserController });
 
 
 export default router;

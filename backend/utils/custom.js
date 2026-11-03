@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import models from "../models/index.js";
-import { compare } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 import {
 	ROLE_TYPE_CODES,
 	getRoleType,
@@ -18,6 +18,8 @@ const CACHE_TTL = 5 * 60 * 1000;
 
 const USER_SENSITIVE_FIELDS = ["password"];
 
+const hashPassword = async (password) => hash(password, 10);
+const verifyPassword = async (password, hashedPassword) => compare(password, hashedPassword);
 
 const signToken = (payload) =>
 	jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -274,4 +276,7 @@ export {
 	getAdminAuthUser,
 	adminAuthValidate,
 	getUserWithPermissions,
+	hashPassword,
+	verifyPassword,
+	USER_SENSITIVE_FIELDS,
 }
