@@ -142,7 +142,7 @@ async function restore(req, res) {
   if (!id) return res.status(400).json(errorResponse("ORG_ID_REQUIRED"));
 
   const organization = await models.Organization.findByPk(id, { paranoid: false });
-  if (!organization || !organization.deleted_at) {
+  if (!organization || !organization.deletedAt) {
     return res.status(404).json(errorResponse("ORG_NOT_FOUND"));
   }
 
