@@ -1,0 +1,25 @@
+.btn-primary {
+  background-color: var(--ls-primary);
+  border-color: var(--ls-primary);
+}
+.btn-primary:hover {
+  background-color: var(--ls-primary-hover);
+  border-color: var(--ls-primary-hover);
+}
+
+.ls-datetime,
+.ls-daterange {
+  position: relative;
+}
+.ls-datetime__trigger,
+.ls-daterange__trigger {
+  display: flex;
+  align-items: center;
+}
+.ls-datetime__popover,
+.ls-daterange__popover {
+  position: absolute;
+  z-index: 1080;
+  margin-top: 4px;
+  background: #fff;
+}

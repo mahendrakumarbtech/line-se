@@ -5,11 +5,6 @@ import {
 
 const STORAGE_PREFIX = "linese_";
 
-export const STORAGE_KEYS = {
-  ADMIN_TOKEN: `${STORAGE_PREFIX}admin_token`,
-  ADMIN_USER: `${STORAGE_PREFIX}admin_user`,
-};
-
 // ---------- localStorage ----------
 export function setLocal(key, value) {
   if (value === undefined || value === null) {
@@ -111,6 +106,42 @@ export async function getAdminUser(token) {
 
 export function clearAdminSession() {
   clearLocal([STORAGE_KEYS.ADMIN_TOKEN, STORAGE_KEYS.ADMIN_USER]);
+}
+
+export const STORAGE_KEYS = {
+  ADMIN_TOKEN: `${STORAGE_PREFIX}admin_token`,
+  ADMIN_USER: `${STORAGE_PREFIX}admin_user`,
+  LANG: `${STORAGE_PREFIX}lang`,
+};
+
+// --- date helpers (pickers) ---
+export function toLocalIsoDate(d = new Date()) {
+  const x = d instanceof Date ? d : new Date(d);
+  const y = x.getFullYear();
+  const m = String(x.getMonth() + 1).padStart(2, "0");
+  const day = String(x.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+export function toLocalIsoTime(d = new Date()) {
+  const x = d instanceof Date ? d : new Date(d);
+  return `${String(x.getHours()).padStart(2, "0")}:${String(x.getMinutes()).padStart(2, "0")}`;
+}
+
+export function parseLocalIsoDate(iso) {
+  if (!iso) return new Date();
+  const [y, m, d] = String(iso).split("-").map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
+}
+
+export function formatDate(d) {
+  if (!d) return "";
+  return parseLocalIsoDate(toLocalIsoDate(d)).toLocaleDateString();
+}
+
+export function formatDateTime(dateIso, timeIso) {
+  if (!dateIso) return "";
+  return `${formatDate(dateIso)}${timeIso ? ` ${timeIso}` : ""}`;
 }
 
 // baad me yahi se constants re-export bhi kar sakte ho:

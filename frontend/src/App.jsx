@@ -4,7 +4,7 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AuthLayout from "./components/admin/AuthLayout";
 import Login from "./pages/admin/auth/Login";
 import ForgotPassword from "./pages/admin/auth/ForgotPassword";
-import Dashboard from "./pages/admin/auth/Dashboard";
+import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import OrganizationsIndex from "./pages/admin/Organization/Index";
 import OrganizationForm from "./pages/admin/Organization/Form";

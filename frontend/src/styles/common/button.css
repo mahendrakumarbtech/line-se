@@ -1,8 +1,0 @@
-.btn-primary {
-  background-color: var(--ls-primary);
-  border-color: var(--ls-primary);
-}
-.btn-primary:hover {
-  background-color: var(--ls-primary-hover);
-  border-color: var(--ls-primary-hover);
-}

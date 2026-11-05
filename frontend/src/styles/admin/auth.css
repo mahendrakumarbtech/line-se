@@ -1,4 +1,4 @@
-@import "../common/button.css";
+@import "../common/style.css";
 
 .auth-wrapper {
   background: var(--ls-body-bg);

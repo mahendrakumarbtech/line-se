@@ -134,6 +134,11 @@ function canAccessAll(userOrKeys, permissions) {
   return permissions.every((p) => canAccess(userOrKeys, p));
 }
 
+export const STATUS_OPTIONS = [
+  { id: 1, text: "Active" },
+  { id: 0, text: "Inactive" },
+];
+
 export {
   ROLE_TYPE_CODES,
   getRoleType,
@@ -146,5 +151,6 @@ export {
   canAccessAny,
   canAccessAll,
   LIMIT_PER_PAGE,
+  STATUS_OPTIONS,
 };
 

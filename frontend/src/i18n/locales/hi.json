@@ -1,0 +1,7 @@
+{
+  "auth.welcome": "हाय लाइनसे!",
+  "auth.signIn": "साइन इन करें",
+  "auth.forgotPassword": "पासवर्ड भूल गए?",
+  "auth.email": "ईमेल",
+  "auth.password": "पासवर्ड"
+}

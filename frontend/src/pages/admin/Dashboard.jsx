@@ -1,4 +1,4 @@
-import { useAdminAuth } from "../../../context/AdminAuthContext";
+import { useAdminAuth } from "../../context/AdminAuthContext";
 
 export default function Dashboard() {
   const { user } = useAdminAuth();

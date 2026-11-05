@@ -1,0 +1,7 @@
+{
+  "auth.welcome": "Welcome to LineSe!",
+  "auth.signIn": "Sign in",
+  "auth.forgotPassword": "Forgot Password?",
+  "auth.email": "Email",
+  "auth.password": "Password"
+}
