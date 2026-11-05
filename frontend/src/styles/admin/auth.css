@@ -1,0 +1,22 @@
+@import "../common/button.css";
+
+.auth-wrapper {
+  background: var(--ls-body-bg);
+}
+.auth-card {
+  max-width: 420px;
+  border-radius: 0.5rem;
+  box-shadow: var(--ls-card-shadow);
+}
+.auth-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ls-heading);
+}
+.auth-title {
+  color: var(--ls-heading);
+  font-weight: 600;
+}
+.auth-subtitle {
+  color: var(--ls-muted);
+}

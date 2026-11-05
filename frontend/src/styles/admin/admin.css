@@ -1,0 +1,13 @@
+@import "../common/button.css";
+
+
+.admin-shell { min-height: 100vh; }
+.admin-sidebar {
+  width: 220px;
+  background: var(--ls-admin-sidebar);
+}
+.admin-sidebar .nav-link.active {
+  background: var(--ls-admin-accent);
+  color: #fff;
+}
+.admin-main { background: var(--ls-admin-bg); }

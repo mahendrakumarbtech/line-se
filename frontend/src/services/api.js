@@ -1,12 +1,9 @@
 export const API_URL = import.meta.env.VITE_API_URL;
 
 
-export async function apiPost(path, body = {}, { auth = true } = {}) {
+export async function apiPost(path, body = {}, { token = null } = {}) {
   const headers = { "Content-Type": "application/json" };
-  if (auth) {
-    const token = localStorage.getItem("admin_token");
-    if (token) headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${API_URL}${path}`, {
     method: "POST",
     headers,
