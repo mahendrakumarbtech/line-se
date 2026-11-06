@@ -198,7 +198,7 @@ async function adminAuthValidate(userId) {
 		return errorResponse("AUTH_USER_NOT_ACTIVE");
 	}
 
-	return successResponse(adminAuthUser, "Authentication successful");
+	return successResponse(adminAuthUser, "AUTH_SUCCESS");
 }
 
 const getUserWithPermissions = async (userId, roleId, organizationId) => {

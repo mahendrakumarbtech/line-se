@@ -3,6 +3,7 @@ import {
   LIMIT_PER_PAGE,
   STATUS_OPTIONS,
   APP_LANGUAGES,
+  getMessageLabel,
 } from "../../../constants.mjs";
 
 const STORAGE_PREFIX = "linese_";
@@ -169,4 +170,5 @@ export {
   LIMIT_PER_PAGE,
   STATUS_OPTIONS,
   APP_LANGUAGES,
+  getMessageLabel,
 };

@@ -17,7 +17,7 @@ async function adminLogin(req, res) {
     if (!validated.status) return res.status(401).json(validated);
 
     const token = signToken({ user_id: user.id });
-    return res.status(200).json(successResponse({ token, user: validated.data }, "Login successful"));
+    return res.status(200).json(successResponse({ token, user: validated.data }, "AUTH_LOGIN_SUCCESS"));
 }
 
 async function dashboard(req, res) {

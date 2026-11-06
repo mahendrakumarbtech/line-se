@@ -2,7 +2,7 @@ import { Op } from "sequelize";
 import {
   errorResponse,
   successResponse,
-  getMessageCode,
+  getMessageLabel,
   LIMIT_PER_PAGE,
   canAccess,
   hashPassword,
@@ -96,7 +96,7 @@ async function index(req, res) {
     return res.status(200).json(
       successResponse(
         { users: rows, total: count, page: pageNum, limit: limitNum },
-        "Users listed successfully"
+        "USER_LISTED"
       )
     );
   } catch {
@@ -108,23 +108,23 @@ async function add(req, res) {
   const { name, email, phone, password, status, role_id } = req.body;
   const errors = {};
 
-  if (!name?.trim()) errors.name = getMessageCode("USER_NAME_REQUIRED").label;
-  if (!email?.trim()) errors.email = getMessageCode("USER_EMAIL_REQUIRED").label;
-  if (!phone?.trim()) errors.phone = getMessageCode("USER_PHONE_REQUIRED").label;
-  if (!password) errors.password = getMessageCode("USER_PASSWORD_REQUIRED").label;
-  if (!role_id) errors.role_id = getMessageCode("USER_ROLE_REQUIRED").label;
+  if (!name?.trim()) errors.name = getMessageLabel("USER_NAME_REQUIRED");
+  if (!email?.trim()) errors.email = getMessageLabel("USER_EMAIL_REQUIRED");
+  if (!phone?.trim()) errors.phone = getMessageLabel("USER_PHONE_REQUIRED");
+  if (!password) errors.password = getMessageLabel("USER_PASSWORD_REQUIRED");
+  if (!role_id) errors.role_id = getMessageLabel("USER_ROLE_REQUIRED");
 
   if (email?.trim() && !errors.email) {
     const exists = await models.User.findOne({ where: { email: email.trim() } });
-    if (exists) errors.email = getMessageCode("USER_EMAIL_EXISTS").label;
+    if (exists) errors.email = getMessageLabel("USER_EMAIL_EXISTS");
   }
   if (phone?.trim() && !errors.phone) {
     const exists = await models.User.findOne({ where: { phone: phone.trim() } });
-    if (exists) errors.phone = getMessageCode("USER_PHONE_EXISTS").label;
+    if (exists) errors.phone = getMessageLabel("USER_PHONE_EXISTS");
   }
 
   const role = role_id ? await findPlatformRole(role_id) : null;
-  if (role_id && !role) errors.role_id = getMessageCode("USER_ROLE_INVALID").label;
+  if (role_id && !role) errors.role_id = getMessageLabel("USER_ROLE_INVALID");
 
   if (Object.keys(errors).length) {
     return res.status(400).json(errorResponse("USER_VALIDATION_FAILED", { errors }));
@@ -147,7 +147,7 @@ async function add(req, res) {
       include: [platformRoleInclude],
     });
 
-    return res.status(200).json(successResponse(created, "User created successfully"));
+    return res.status(200).json(successResponse(created, "USER_CREATED"));
   } catch {
     return res.status(500).json(errorResponse("USER_CREATE_FAILED"));
   }
@@ -161,26 +161,26 @@ async function edit(req, res) {
   if (!user) return res.status(404).json(errorResponse("USER_NOT_FOUND"));
 
   const errors = {};
-  if (!name?.trim()) errors.name = getMessageCode("USER_NAME_REQUIRED").label;
-  if (!email?.trim()) errors.email = getMessageCode("USER_EMAIL_REQUIRED").label;
-  if (!phone?.trim()) errors.phone = getMessageCode("USER_PHONE_REQUIRED").label;
-  if (!role_id) errors.role_id = getMessageCode("USER_ROLE_REQUIRED").label;
+  if (!name?.trim()) errors.name = getMessageLabel("USER_NAME_REQUIRED");
+  if (!email?.trim()) errors.email = getMessageLabel("USER_EMAIL_REQUIRED");
+  if (!phone?.trim()) errors.phone = getMessageLabel("USER_PHONE_REQUIRED");
+  if (!role_id) errors.role_id = getMessageLabel("USER_ROLE_REQUIRED");
 
   if (email?.trim() && !errors.email) {
     const exists = await models.User.findOne({
       where: { email: email.trim(), id: { [Op.ne]: id } },
     });
-    if (exists) errors.email = getMessageCode("USER_EMAIL_EXISTS").label;
+    if (exists) errors.email = getMessageLabel("USER_EMAIL_EXISTS");
   }
   if (phone?.trim() && !errors.phone) {
     const exists = await models.User.findOne({
       where: { phone: phone.trim(), id: { [Op.ne]: id } },
     });
-    if (exists) errors.phone = getMessageCode("USER_PHONE_EXISTS").label;
+    if (exists) errors.phone = getMessageLabel("USER_PHONE_EXISTS");
   }
 
   const role = role_id ? await findPlatformRole(role_id) : null;
-  if (role_id && !role) errors.role_id = getMessageCode("USER_ROLE_INVALID").label;
+  if (role_id && !role) errors.role_id = getMessageLabel("USER_ROLE_INVALID");
 
   if (Object.keys(errors).length) {
     return res.status(400).json(errorResponse("USER_VALIDATION_FAILED", { errors }));
@@ -207,7 +207,7 @@ async function edit(req, res) {
       include: [platformRoleInclude],
     });
 
-    return res.status(200).json(successResponse(updated, "User updated successfully"));
+    return res.status(200).json(successResponse(updated, "USER_UPDATED"));
   } catch {
     return res.status(500).json(errorResponse("USER_UPDATE_FAILED"));
   }
@@ -226,7 +226,7 @@ async function softDelete(req, res) {
   try {
     await user.destroy();
     invalidateUserCache(id);
-    return res.status(200).json(successResponse(null, "User deleted successfully"));
+    return res.status(200).json(successResponse(null, "USER_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("USER_DELETE_FAILED"));
   }
@@ -245,7 +245,7 @@ async function bulkSoftDelete(req, res) {
   try {
     await models.User.destroy({ where: { id: { [Op.in]: filtered } } });
     filtered.forEach(invalidateUserCache);
-    return res.status(200).json(successResponse(null, "Users deleted successfully"));
+    return res.status(200).json(successResponse(null, "USERS_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("USER_DELETE_FAILED"));
   }
@@ -268,7 +268,7 @@ async function restore(req, res) {
       attributes: USER_SAFE_ATTR,
       include: [platformRoleInclude],
     });
-    return res.status(200).json(successResponse(restored, "User restored successfully"));
+    return res.status(200).json(successResponse(restored, "USER_RESTORED"));
   } catch {
     return res.status(500).json(errorResponse("USER_UPDATE_FAILED"));
   }
@@ -283,7 +283,7 @@ async function bulkRestore(req, res) {
   try {
     await models.User.restore({ where: { id: { [Op.in]: ids } } });
     ids.forEach(invalidateUserCache);
-    return res.status(200).json(successResponse(null, "Users restored successfully"));
+    return res.status(200).json(successResponse(null, "USERS_RESTORED"));
   } catch {
     return res.status(500).json(errorResponse("USER_BULK_RESTORE_FAILED"));
   }
@@ -303,7 +303,7 @@ async function forceDelete(req, res) {
     await models.UserRole.destroy({ where: { user_id: id } });
     await user.destroy({ force: true });
     invalidateUserCache(id);
-    return res.status(200).json(successResponse(null, "User permanently deleted"));
+    return res.status(200).json(successResponse(null, "USER_PERMANENTLY_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("USER_DELETE_FAILED"));
   }
@@ -323,7 +323,7 @@ async function bulkForceDelete(req, res) {
     await models.UserRole.destroy({ where: { user_id: { [Op.in]: filtered } } });
     await models.User.destroy({ where: { id: { [Op.in]: filtered } }, force: true });
     filtered.forEach(invalidateUserCache);
-    return res.status(200).json(successResponse(null, "Users permanently deleted"));
+    return res.status(200).json(successResponse(null, "USERS_PERMANENTLY_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("USER_BULK_DELETE_FAILED"));
   }
@@ -346,7 +346,7 @@ async function changeStatus(req, res) {
     await user.update({ status: Number(status) });
     invalidateUserCache(id);
     const updated = await models.User.findByPk(id, { attributes: USER_SAFE_ATTR });
-    return res.status(200).json(successResponse(updated, "User status changed successfully"));
+    return res.status(200).json(successResponse(updated, "USER_STATUS_CHANGED"));
   } catch {
     return res.status(500).json(errorResponse("USER_UPDATE_FAILED"));
   }

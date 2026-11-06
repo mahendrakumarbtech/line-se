@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { errorResponse, successResponse, getMessageCode, LIMIT_PER_PAGE, canAccess } from "../../utils/custom.js";
+import { errorResponse, successResponse, getMessageLabel, LIMIT_PER_PAGE, canAccess } from "../../utils/custom.js";
 import models from "../../models/index.js";
 
 async function index(req, res) {
@@ -38,7 +38,7 @@ async function index(req, res) {
       total: count,
       page,
       limit
-    }, "Organizations listed successfully"));
+    }, "ORG_LISTED"));
   } catch (error) {
     return res.status(500).json(errorResponse("ORG_LIST_FAILED"));
   }
@@ -48,15 +48,15 @@ async function add(req, res) {
   const { name, slug, type, status } = req.body;
   const errors = {};
 
-  if (!name?.trim()) errors.name = getMessageCode("ORG_NAME_REQUIRED").label;
-  if (!slug?.trim()) errors.slug = getMessageCode("ORG_SLUG_REQUIRED").label;
+  if (!name?.trim()) errors.name = getMessageLabel("ORG_NAME_REQUIRED");
+  if (!slug?.trim()) errors.slug = getMessageLabel("ORG_SLUG_REQUIRED");
   if (type === undefined || type === null || type === "") {
-    errors.type = getMessageCode("ORG_TYPE_REQUIRED").label;
+    errors.type = getMessageLabel("ORG_TYPE_REQUIRED");
   }
 
   if (slug?.trim() && !errors.slug) {
     const exists = await models.Organization.findOne({ where: { slug: slug.trim() } });
-    if (exists) errors.slug = getMessageCode("ORG_SLUG_EXISTS").label;
+    if (exists) errors.slug = getMessageLabel("ORG_SLUG_EXISTS");
   }
 
   if (Object.keys(errors).length) {
@@ -67,7 +67,7 @@ async function add(req, res) {
 
   try {
     const organization = await models.Organization.create({ name: name.trim(), slug: slug.trim(), type, status });
-    return res.status(200).json(successResponse(organization, "Organization created successfully"));
+    return res.status(200).json(successResponse(organization, "ORG_CREATED"));
   } catch (error) {
     return res.status(500).json(errorResponse("ORG_CREATE_FAILED"));
   }
@@ -81,16 +81,16 @@ async function edit(req, res) {
   if (!organization) return res.status(404).json(errorResponse("ORG_NOT_FOUND"));
 
   const errors = {};
-  if (!name?.trim()) errors.name = getMessageCode("ORG_NAME_REQUIRED").label;
-  if (!slug?.trim()) errors.slug = getMessageCode("ORG_SLUG_REQUIRED").label;
+  if (!name?.trim()) errors.name = getMessageLabel("ORG_NAME_REQUIRED");
+  if (!slug?.trim()) errors.slug = getMessageLabel("ORG_SLUG_REQUIRED");
   if (type === undefined || type === null || type === "") {
-    errors.type = getMessageCode("ORG_TYPE_REQUIRED").label;
+    errors.type = getMessageLabel("ORG_TYPE_REQUIRED");
   }
   if (slug?.trim() && !errors.slug) {
     const exists = await models.Organization.findOne({
       where: { slug: slug.trim(), id: { [Op.ne]: id } },
     });
-    if (exists) errors.slug = getMessageCode("ORG_SLUG_EXISTS").label;
+    if (exists) errors.slug = getMessageLabel("ORG_SLUG_EXISTS");
   }
   if (Object.keys(errors).length) {
     return res.status(400).json(errorResponse("ORG_VALIDATION_FAILED", { errors }));
@@ -103,7 +103,7 @@ async function edit(req, res) {
       type,
       ...(status !== undefined ? { status } : {}),
     });
-    return res.status(200).json(successResponse(organization, "Organization updated successfully"));
+    return res.status(200).json(successResponse(organization, "ORG_UPDATED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_UPDATE_FAILED"));
   }
@@ -118,7 +118,7 @@ async function softDelete(req, res) {
 
   try {
     await organization.destroy(); // soft
-    return res.status(200).json(successResponse(null, "Organization deleted successfully"));
+    return res.status(200).json(successResponse(null, "ORG_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_DELETE_FAILED"));
   }
@@ -134,7 +134,7 @@ async function bulkSoftDelete(req, res) {
     await models.Organization.destroy({
       where: { id: { [Op.in]: ids } },
     });
-    return res.status(200).json(successResponse(null, "Organization deleted successfully"));
+    return res.status(200).json(successResponse(null, "ORGS_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_DELETE_FAILED"));
   }
@@ -151,7 +151,7 @@ async function restore(req, res) {
 
   try {
     await organization.restore();
-    return res.status(200).json(successResponse(organization, "Organization restored successfully"));
+    return res.status(200).json(successResponse(organization, "ORG_RESTORED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_UPDATE_FAILED"));
   }
@@ -168,7 +168,7 @@ async function bulkRestore(req, res) {
 
   try {
     await models.Organization.restore({ where: { id: { [Op.in]: ids } } });
-    return res.status(200).json(successResponse(null, "Organizations restored successfully"));
+    return res.status(200).json(successResponse(null, "ORGS_RESTORED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_BULK_RESTORE_FAILED"));
   }
@@ -183,7 +183,7 @@ async function forceDelete(req, res) {
 
   try {
     await organization.destroy({ force: true }); // force
-    return res.status(200).json(successResponse(null, "Organization deleted successfully"));
+    return res.status(200).json(successResponse(null, "ORG_PERMANENTLY_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_DELETE_FAILED"));
   }
@@ -197,7 +197,7 @@ async function bulkForceDelete(req, res) {
 
   try {
     await models.Organization.destroy({ where: { id: { [Op.in]: ids } }, force: true }); // force
-    return res.status(200).json(successResponse(null, "Organizations deleted successfully"));
+    return res.status(200).json(successResponse(null, "ORGS_PERMANENTLY_DELETED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_BULK_DELETE_FAILED"));
   }
@@ -213,7 +213,7 @@ async function changeStatus(req, res) {
 
   try {
     await organization.update({ status });
-    return res.status(200).json(successResponse(organization, "Organization status changed successfully"));
+    return res.status(200).json(successResponse(organization, "ORG_STATUS_CHANGED"));
   } catch {
     return res.status(500).json(errorResponse("ORG_UPDATE_FAILED"));
   }

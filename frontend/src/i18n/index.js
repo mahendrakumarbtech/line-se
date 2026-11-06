@@ -1,11 +1,9 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import en from "./locales/en.json";
-import hi from "./locales/hi.json";
-import hinglish from "./locales/hinglish.json";
+import en from "../../../locales/en.json";
+import hi from "../../../locales/hi.json";
+import hinglish from "../../../locales/hinglish.json";
 import { getLocal, setLocal, STORAGE_KEYS } from "../utils/custom";
-
-// STORAGE_KEYS me add: LANG: "linese_lang"
 
 const saved = getLocal(STORAGE_KEYS.LANG) || "en";
 

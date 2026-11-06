@@ -4,10 +4,6 @@ import hinglish from "./locales/hinglish.json" with { type: "json" };
 
 const LOCALES = { en, hi, hinglish };
 
-
-
-
-
 const LIMIT_PER_PAGE = 10;
 
 const ROLE_TYPE_CODES = Object.freeze([
@@ -24,59 +20,71 @@ const getRoleType = (key) => ROLE_TYPE_CODES.find((item) => item.key === key);
 
 
 const MESSAGE_CODES = Object.freeze([
-  { key: "AUTH_TOKEN_MISSING", value: "100001", label: "Your request is not authorized please provide a valid token" },
-  { key: "AUTH_USER_NOT_FOUND", value: "100002", label: "User not found" },
-  { key: "AUTH_NOT_PLATFORM_ROLE", value: "100003", label: "You are not authorized to access this platform" },
-  { key: "AUTH_USER_NOT_ACTIVE", value: "100004", label: "Your account is not active please contact admin" },
-  { key: "AUTH_ROLE_NOT_ACTIVE", value: "100005", label: "Your role is not active please contact admin" },
-  { key: "AUTH_ORG_NOT_ACTIVE", value: "100006", label: "Your organization is not active please contact admin" },
-  { key: "AUTH_MEMBERSHIP_NOT_ACTIVE", value: "100007", label: "Your membership is not active please contact admin" },
-  { key: "AUTH_ACCOUNT_NOT_ACTIVE", value: "100008", label: "Your account is not active please contact admin" },
-  { key: "AUTH_TOKEN_INVALID", value: "100009", label: "Your request is not authorized please provide a valid token" },
-  { key: "AUTH_INVALID_PASSWORD", value: "100010", label: "Invalid password" },
-  { key: "AUTH_PERMISSION_DENIED", value: "100011", label: "You do not have permission to perform this action" },
-  { key: "ORG_NOT_FOUND", value: "300001", label: "Organization not found" },
-  { key: "ORG_SLUG_EXISTS", value: "300002", label: "Organization slug already exists" },
-  { key: "ORG_CREATE_FAILED", value: "300003", label: "Failed to create organization" },
-  { key: "ORG_VALIDATION_FAILED", value: "300004", label: "Validation failed" },
-  { key: "ORG_NAME_REQUIRED", value: "300005", label: "Name is required" },
-  { key: "ORG_SLUG_REQUIRED", value: "300006", label: "Slug is required" },
-  { key: "ORG_TYPE_REQUIRED", value: "300007", label: "Type is required" },
-  { key: "ORG_LIST_FAILED", value: "300008", label: "Failed to list organizations" },
-  { key: "ORG_ID_REQUIRED", value: "300009", label: "Organization id is required" },
-  { key: "ORG_UPDATE_FAILED", value: "300010", label: "Failed to update organization" },
-  { key: "ORG_DELETE_FAILED", value: "300011", label: "Failed to delete organization" },
-  { key: "ORG_IDS_REQUIRED", value: "300012", label: "Organization ids are required" },
-  { key: "ORG_STATUS_REQUIRED", value: "300013", label: "Status is required" },
-  { key: "ORG_BULK_DELETE_FAILED", value: "300014", label: "Failed to bulk delete organizations" },
-  { key: "USER_NOT_FOUND", value: "200001", label: "User not found" },
-  { key: "USER_EMAIL_EXISTS", value: "200002", label: "Email already exists" },
-  { key: "USER_PHONE_EXISTS", value: "200003", label: "Phone already exists" },
-  { key: "USER_CREATE_FAILED", value: "200004", label: "Failed to create user" },
-  { key: "USER_VALIDATION_FAILED", value: "200005", label: "Validation failed" },
-  { key: "USER_NAME_REQUIRED", value: "200006", label: "Name is required" },
-  { key: "USER_EMAIL_REQUIRED", value: "200007", label: "Email is required" },
-  { key: "USER_PHONE_REQUIRED", value: "200008", label: "Phone is required" },
-  { key: "USER_PASSWORD_REQUIRED", value: "200009", label: "Password is required" },
-  { key: "USER_ROLE_REQUIRED", value: "200010", label: "Role is required" },
-  { key: "USER_ROLE_INVALID", value: "200011", label: "Invalid platform role" },
-  { key: "USER_LIST_FAILED", value: "200012", label: "Failed to list users" },
-  { key: "USER_ID_REQUIRED", value: "200013", label: "User id is required" },
-  { key: "USER_UPDATE_FAILED", value: "200014", label: "Failed to update user" },
-  { key: "USER_DELETE_FAILED", value: "200015", label: "Failed to delete user" },
-  { key: "USER_IDS_REQUIRED", value: "200016", label: "User ids are required" },
-  { key: "USER_STATUS_REQUIRED", value: "200017", label: "Status is required" },
-  { key: "USER_BULK_DELETE_FAILED", value: "200018", label: "Failed to bulk delete users" },
-  { key: "USER_BULK_RESTORE_FAILED", value: "200019", label: "Failed to bulk restore users" },
-  { key: "USER_SELF_ACTION_DENIED", value: "200020", label: "You cannot perform this action on your own account" },
+  { key: "AUTH_TOKEN_MISSING", value: "100001" },
+  { key: "AUTH_USER_NOT_FOUND", value: "100002" },
+  { key: "AUTH_NOT_PLATFORM_ROLE", value: "100003" },
+  { key: "AUTH_USER_NOT_ACTIVE", value: "100004" },
+  { key: "AUTH_ROLE_NOT_ACTIVE", value: "100005" },
+  { key: "AUTH_ORG_NOT_ACTIVE", value: "100006" },
+  { key: "AUTH_MEMBERSHIP_NOT_ACTIVE", value: "100007" },
+  { key: "AUTH_ACCOUNT_NOT_ACTIVE", value: "100008" },
+  { key: "AUTH_TOKEN_INVALID", value: "100009" },
+  { key: "AUTH_INVALID_PASSWORD", value: "100010" },
+  { key: "AUTH_PERMISSION_DENIED", value: "100011" },
+  { key: "ORG_NOT_FOUND", value: "300001" },
+  { key: "ORG_SLUG_EXISTS", value: "300002" },
+  { key: "ORG_CREATE_FAILED", value: "300003" },
+  { key: "ORG_VALIDATION_FAILED", value: "300004" },
+  { key: "ORG_NAME_REQUIRED", value: "300005" },
+  { key: "ORG_SLUG_REQUIRED", value: "300006" },
+  { key: "ORG_TYPE_REQUIRED", value: "300007" },
+  { key: "ORG_LIST_FAILED", value: "300008" },
+  { key: "ORG_ID_REQUIRED", value: "300009" },
+  { key: "ORG_UPDATE_FAILED", value: "300010" },
+  { key: "ORG_DELETE_FAILED", value: "300011" },
+  { key: "ORG_IDS_REQUIRED", value: "300012" },
+  { key: "ORG_STATUS_REQUIRED", value: "300013" },
+  { key: "ORG_BULK_DELETE_FAILED", value: "300014" },
+  { key: "ORG_BULK_RESTORE_FAILED", value: "300015" },
+  { key: "USER_NOT_FOUND", value: "200001" },
+  { key: "USER_EMAIL_EXISTS", value: "200002" },
+  { key: "USER_PHONE_EXISTS", value: "200003" },
+  { key: "USER_CREATE_FAILED", value: "200004" },
+  { key: "USER_VALIDATION_FAILED", value: "200005" },
+  { key: "USER_NAME_REQUIRED", value: "200006" },
+  { key: "USER_EMAIL_REQUIRED", value: "200007" },
+  { key: "USER_PHONE_REQUIRED", value: "200008" },
+  { key: "USER_PASSWORD_REQUIRED", value: "200009" },
+  { key: "USER_ROLE_REQUIRED", value: "200010" },
+  { key: "USER_ROLE_INVALID", value: "200011" },
+  { key: "USER_LIST_FAILED", value: "200012" },
+  { key: "USER_ID_REQUIRED", value: "200013" },
+  { key: "USER_UPDATE_FAILED", value: "200014" },
+  { key: "USER_DELETE_FAILED", value: "200015" },
+  { key: "USER_IDS_REQUIRED", value: "200016" },
+  { key: "USER_STATUS_REQUIRED", value: "200017" },
+  { key: "USER_BULK_DELETE_FAILED", value: "200018" },
+  { key: "USER_BULK_RESTORE_FAILED", value: "200019" },
+  { key: "USER_SELF_ACTION_DENIED", value: "200020" },
 ]);
 
 const getMessageCode = (key) => MESSAGE_CODES.find((item) => item.key === key);
 
+/** Resolve user-facing text from locales by MESSAGE key or full i18n key. */
 const getMessageLabel = (key, lang = "en") => {
+  if (!key) return "";
   const bag = LOCALES[lang] || LOCALES.en;
-  const i18nKey = key.startsWith("errors.") ? key : `errors.${key}`;
-  return bag[i18nKey] || LOCALES.en[i18nKey] || key;
+  const enBag = LOCALES.en;
+  if (key.startsWith("errors.") || key.startsWith("success.") || key.includes(".")) {
+    return bag[key] || enBag[key] || key;
+  }
+  return (
+    bag[`errors.${key}`] ||
+    bag[`success.${key}`] ||
+    enBag[`errors.${key}`] ||
+    enBag[`success.${key}`] ||
+    key
+  );
 };
 
 const ADMIN_PERMISSIONS = [
