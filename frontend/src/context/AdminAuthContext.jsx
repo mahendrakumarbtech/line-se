@@ -43,14 +43,23 @@ export function AdminAuthProvider({ children }) {
   const login = async (email, password) => {
     const res = await apiPost("/admin/login", { email, password });
     if (res?.status !== 1) {
-      return { ok: false, message: res?.message || "Login failed" };
+      return {
+        status: 0,
+        message: res?.message || "Login failed",
+        key: res?.key,
+        error_code: res?.error_code,
+        data: res?.data,
+      };
     }
     const nextToken = res.data.token;
     setAdminToken(nextToken);
     await setAdminUser(res.data.user, nextToken);
     setToken(nextToken);
     setUser(res.data.user);
-    return { ok: true };
+    return {
+      status: 1,
+      data: res.data
+    };
   };
 
   const logout = () => {

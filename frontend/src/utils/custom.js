@@ -1,6 +1,8 @@
 import {
   canAccess,
   LIMIT_PER_PAGE,
+  STATUS_OPTIONS,
+  APP_LANGUAGES,
 } from "../../../constants.mjs";
 
 const STORAGE_PREFIX = "linese_";
@@ -144,8 +146,27 @@ export function formatDateTime(dateIso, timeIso) {
   return `${formatDate(dateIso)}${timeIso ? ` ${timeIso}` : ""}`;
 }
 
+export function apiMessage(res, t, fallbackKey = "common.error") {
+  // prefer API key → errors.AUTH_INVALID_PASSWORD
+  if (res?.key) {
+    const i18nKey = `errors.${res.key}`;
+    const translated = t(i18nKey);
+    if (translated !== i18nKey) return translated;
+  }
+  return res?.message || t(fallbackKey);
+}
+
+export function applyServerErrors(data, setErrors) {
+  // backend: { status:0, message, data: { email: "...", password: "..." } }
+  if (data && typeof data === "object") {
+    setErrors((prev) => ({ ...prev, ...data }));
+  }
+}
+
 // baad me yahi se constants re-export bhi kar sakte ho:
 export {
   canAccess,
-  LIMIT_PER_PAGE
+  LIMIT_PER_PAGE,
+  STATUS_OPTIONS,
+  APP_LANGUAGES,
 };

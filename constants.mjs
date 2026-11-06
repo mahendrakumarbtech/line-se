@@ -1,3 +1,13 @@
+import en from "./locales/en.json" with { type: "json" };
+import hi from "./locales/hi.json" with { type: "json" };
+import hinglish from "./locales/hinglish.json" with { type: "json" };
+
+const LOCALES = { en, hi, hinglish };
+
+
+
+
+
 const LIMIT_PER_PAGE = 10;
 
 const ROLE_TYPE_CODES = Object.freeze([
@@ -63,6 +73,11 @@ const MESSAGE_CODES = Object.freeze([
 
 const getMessageCode = (key) => MESSAGE_CODES.find((item) => item.key === key);
 
+const getMessageLabel = (key, lang = "en") => {
+  const bag = LOCALES[lang] || LOCALES.en;
+  const i18nKey = key.startsWith("errors.") ? key : `errors.${key}`;
+  return bag[i18nKey] || LOCALES.en[i18nKey] || key;
+};
 
 const ADMIN_PERMISSIONS = [
   { name: "View Dashboard", slug: "dashboard.view", module: "dashboard" },
@@ -86,14 +101,25 @@ const ADMIN_PERMISSIONS = [
   { name: "Change Role Status", slug: "role.change-status", module: "role" },
 ];
 
-const errorResponse = (key, data) => {
+const errorResponse = (key, data, lang = "en") => {
   const err = getMessageCode(key);
-  const body = { status: 0, error_code: err.value, message: err.label };
+  const body = {
+    status: 0,
+    error_code: err.value,
+    key: err.key,
+    message: getMessageLabel(err.key, lang),
+  };
   if (data !== undefined) body.data = data;
   return body;
 };
-const successResponse = (data, message) => {
-  const body = { status: 1, message: message };
+
+const successResponse = (data, keyOrMessage, lang = "en") => {
+  const body = { status: 1 };
+  if (keyOrMessage) {
+    // key prefer: "AUTH_LOGIN_SUCCESS" → locales se
+    body.key = keyOrMessage;
+    body.message = getMessageLabel(keyOrMessage, lang);
+  }
   if (data !== undefined) body.data = data;
   return body;
 };
@@ -134,9 +160,15 @@ function canAccessAll(userOrKeys, permissions) {
   return permissions.every((p) => canAccess(userOrKeys, p));
 }
 
-export const STATUS_OPTIONS = [
+const STATUS_OPTIONS = [
   { id: 1, text: "Active" },
   { id: 0, text: "Inactive" },
+];
+
+const APP_LANGUAGES = [
+  { key: "en", label: "English" },
+  { key: "hi", label: "हिन्दी" },
+  { key: "hinglish", label: "हिnglish" },
 ];
 
 export {
@@ -144,13 +176,15 @@ export {
   getRoleType,
   MESSAGE_CODES,
   getMessageCode,
-  ADMIN_PERMISSIONS,
+  getMessageLabel,
   errorResponse,
   successResponse,
+  ADMIN_PERMISSIONS,
   canAccess,
   canAccessAny,
   canAccessAll,
   LIMIT_PER_PAGE,
   STATUS_OPTIONS,
+  APP_LANGUAGES,
 };
 
