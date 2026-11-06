@@ -5,8 +5,7 @@ import { useAdminAuth } from "../../../context/AdminAuthContext";
 import PasswordInput from "../../../components/common/PasswordInput";
 import { notify } from "../../../components/common/toast";
 import FormField from "../../../components/common/FormField";
-import { apiMessage, applyServerErrors } from "../../../utils/custom";
-
+import { applyServerErrors } from "../../../utils/custom";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -41,15 +40,12 @@ export default function Login() {
     setSubmitting(false);
 
     if (result.status !== 1) {
-      if (result.key === "AUTH_USER_NOT_FOUND") {
-        setErrors({ email: result.message });
-      } else if (result.key === "AUTH_INVALID_PASSWORD") {
-        setErrors({ password: result.message });
-      }
-      notify.error(result.message || t("auth.signInFailed"));
+      // Backend: { status:0, message: FORM_INVALID, errors: { email, password } }
+      applyServerErrors(result, setErrors);
+      notify.error(result.message || t("validation.formInvalid"));
       return;
     }
-    notify.success(t("auth.signInSuccess"));
+    notify.success(result.message || t("auth.signInSuccess"));
     navigate("/admin/dashboard", { replace: true });
   };
 
@@ -73,7 +69,6 @@ export default function Login() {
               setEmail(e.target.value);
               setErrors((p) => ({ ...p, email: "" }));
             }}
-          // no required
           />
         </FormField>
         <div className="d-flex justify-content-between mb-1">

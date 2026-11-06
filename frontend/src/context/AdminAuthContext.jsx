@@ -48,6 +48,7 @@ export function AdminAuthProvider({ children }) {
         message: res?.message || "Login failed",
         key: res?.key,
         error_code: res?.error_code,
+        errors: res?.errors,
         data: res?.data,
       };
     }

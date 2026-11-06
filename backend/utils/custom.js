@@ -206,27 +206,34 @@ const getAdminAuthUser = async (userId) => {
 };
 
 
+/**
+ * Platform admin auth checks (common for login / forgot / middleware).
+ * Success: { user }
+ * Fail: { error: label, key } — caller maps into field errors or errorResponse(key)
+ */
 async function adminAuthValidate(userId) {
 	const PLATFORM_ROLES = ROLE_TYPE_CODES
 		.filter((r) => r.panel === "admin")
 		.map((r) => r.value);
 
+	const fail = (key) => ({ error: getMessageLabel(key), key });
+
 	const adminAuthUser = await getAdminAuthUser(userId);
-	if (!adminAuthUser) return errorResponse("AUTH_NOT_PLATFORM_ROLE");
+	if (!adminAuthUser) return fail("AUTH_NOT_PLATFORM_ROLE");
 
 	if (adminAuthUser.role?.status !== 1) {
-		return errorResponse("AUTH_ROLE_NOT_ACTIVE");
+		return fail("AUTH_ROLE_NOT_ACTIVE");
 	}
 
 	if (!PLATFORM_ROLES.includes(adminAuthUser.role?.role_type)) {
-		return errorResponse("AUTH_NOT_PLATFORM_ROLE");
+		return fail("AUTH_NOT_PLATFORM_ROLE");
 	}
 
 	if (adminAuthUser.status !== 1) {
-		return errorResponse("AUTH_USER_NOT_ACTIVE");
+		return fail("AUTH_USER_NOT_ACTIVE");
 	}
 
-	return successResponse(adminAuthUser, "AUTH_SUCCESS");
+	return { user: adminAuthUser };
 }
 
 const getUserWithPermissions = async (userId, roleId, organizationId) => {

@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { notify } from "../../../components/common/toast";
 import FormField from "../../../components/common/FormField";
+import { apiPost } from "../../../services/api";
+import { applyServerErrors } from "../../../utils/custom";
 
 export default function ForgotPassword() {
   const { t } = useTranslation();
@@ -24,9 +26,17 @@ export default function ForgotPassword() {
     }
 
     setSubmitting(true);
-    // TODO: apiPost("/admin/auth/forgot-password", { email: email.trim() })
+    const res = await apiPost("/admin/forgot-password", { email: email.trim().toLowerCase() });
     setSubmitting(false);
-    notify.success(t("auth.forgotSent"));
+
+    if (res?.status !== 1) {
+      applyServerErrors(res, setErrors);
+      notify.error(res?.message || t("validation.formInvalid"));
+      return;
+    }
+
+    setErrors({});
+    notify.success(res.message || t("auth.forgotSent"));
   };
 
   return (

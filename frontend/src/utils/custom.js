@@ -157,11 +157,16 @@ export function apiMessage(res, t, fallbackKey = "common.error") {
   return res?.message || t(fallbackKey);
 }
 
-export function applyServerErrors(data, setErrors) {
-  // backend: { status:0, message, data: { email: "...", password: "..." } }
-  if (data && typeof data === "object") {
-    setErrors((prev) => ({ ...prev, ...data }));
-  }
+/** Apply API field errors: { status:0, message, errors: { email, password, ... } } */
+export function applyServerErrors(resOrErrors, setErrors) {
+  const fieldErrors =
+    resOrErrors?.errors && typeof resOrErrors.errors === "object"
+      ? resOrErrors.errors
+      : resOrErrors?.data?.errors && typeof resOrErrors.data.errors === "object"
+        ? resOrErrors.data.errors
+        : null;
+  if (!fieldErrors) return;
+  setErrors((prev) => ({ ...prev, ...fieldErrors }));
 }
 
 // baad me yahi se constants re-export bhi kar sakte ho:

@@ -42,6 +42,9 @@
   "errors.AUTH_TOKEN_INVALID": "Your request is not authorized. Please provide a valid token.",
   "errors.AUTH_INVALID_PASSWORD": "Invalid password",
   "errors.AUTH_PERMISSION_DENIED": "You do not have permission to perform this action",
+  "errors.AUTH_INVALID_CREDENTIALS": "Invalid credentials",
+  "errors.AUTH_EMAIL_NOT_FOUND": "No account found with this email",
+  "errors.FORM_INVALID": "Please fill the required fields",
 
   "errors.ORG_NOT_FOUND": "Organization not found",
   "errors.ORG_SLUG_EXISTS": "Organization slug already exists",
@@ -82,6 +85,7 @@
 
   "success.AUTH_LOGIN_SUCCESS": "Login successful",
   "success.AUTH_SUCCESS": "Authentication successful",
+  "success.AUTH_FORGOT_SENT": "Password reset link has been sent to your email",
   "success.USER_LISTED": "Users listed successfully",
   "success.USER_CREATED": "User created successfully",
   "success.USER_UPDATED": "User updated successfully",

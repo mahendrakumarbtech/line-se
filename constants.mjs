@@ -31,6 +31,9 @@ const MESSAGE_CODES = Object.freeze([
   { key: "AUTH_TOKEN_INVALID", value: "100009" },
   { key: "AUTH_INVALID_PASSWORD", value: "100010" },
   { key: "AUTH_PERMISSION_DENIED", value: "100011" },
+  { key: "AUTH_INVALID_CREDENTIALS", value: "100012" },
+  { key: "AUTH_EMAIL_NOT_FOUND", value: "100013" },
+  { key: "FORM_INVALID", value: "100014" },
   { key: "ORG_NOT_FOUND", value: "300001" },
   { key: "ORG_SLUG_EXISTS", value: "300002" },
   { key: "ORG_CREATE_FAILED", value: "300003" },
@@ -109,22 +112,45 @@ const ADMIN_PERMISSIONS = [
   { name: "Change Role Status", slug: "role.change-status", module: "role" },
 ];
 
+/**
+ * Fail envelope (status number, not boolean):
+ * { status: 0, error_code, key, message, errors?, data? }
+ * - Field errors → pass { errors: { email: "...", ... } }
+ * - Then `message` becomes FORM_INVALID (toast common text); field texts stay in `errors`.
+ */
 const errorResponse = (key, data, lang = "en") => {
   const err = getMessageCode(key);
+  const fieldErrors =
+    data && typeof data === "object" && data.errors && typeof data.errors === "object"
+      ? data.errors
+      : null;
+
   const body = {
     status: 0,
-    error_code: err.value,
-    key: err.key,
-    message: getMessageLabel(err.key, lang),
+    error_code: err?.value,
+    key: err?.key || key,
+    message: fieldErrors
+      ? getMessageLabel("FORM_INVALID", lang)
+      : getMessageLabel(err?.key || key, lang),
   };
-  if (data !== undefined) body.data = data;
+
+  if (fieldErrors) {
+    body.errors = fieldErrors;
+    const { errors: _ignore, ...rest } = data;
+    if (Object.keys(rest).length) body.data = rest;
+  } else if (data !== undefined) {
+    body.data = data;
+  }
   return body;
 };
 
+/**
+ * Success envelope:
+ * { status: 1, message?, key?, data? }
+ */
 const successResponse = (data, keyOrMessage, lang = "en") => {
   const body = { status: 1 };
   if (keyOrMessage) {
-    // key prefer: "AUTH_LOGIN_SUCCESS" → locales se
     body.key = keyOrMessage;
     body.message = getMessageLabel(keyOrMessage, lang);
   }

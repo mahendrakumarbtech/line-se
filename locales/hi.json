@@ -42,6 +42,9 @@
   "errors.AUTH_TOKEN_INVALID": "आपका अनुरोध अधिकृत नहीं है। कृपया मान्य टोकन दें।",
   "errors.AUTH_INVALID_PASSWORD": "अमान्य पासवर्ड",
   "errors.AUTH_PERMISSION_DENIED": "आपको यह कार्य करने की अनुमति नहीं है",
+  "errors.AUTH_INVALID_CREDENTIALS": "अमान्य लॉगिन विवरण",
+  "errors.AUTH_EMAIL_NOT_FOUND": "इस ईमेल से कोई खाता नहीं मिला",
+  "errors.FORM_INVALID": "कृपया आवश्यक फ़ील्ड भरें",
 
   "errors.ORG_NOT_FOUND": "संगठन नहीं मिला",
   "errors.ORG_SLUG_EXISTS": "संगठन स्लग पहले से मौजूद है",
@@ -82,6 +85,7 @@
 
   "success.AUTH_LOGIN_SUCCESS": "लॉगिन सफल",
   "success.AUTH_SUCCESS": "प्रमाणीकरण सफल",
+  "success.AUTH_FORGOT_SENT": "पासवर्ड रीसेट लिंक आपके ईमेल पर भेज दिया गया है",
   "success.USER_LISTED": "उपयोगकर्ता सूची सफलतापूर्वक लोड हुई",
   "success.USER_CREATED": "उपयोगकर्ता सफलतापूर्वक बनाया गया",
   "success.USER_UPDATED": "उपयोगकर्ता सफलतापूर्वक अपडेट हुआ",

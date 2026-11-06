@@ -42,6 +42,9 @@
   "errors.AUTH_TOKEN_INVALID": "Request authorized nahi hai. Valid token do.",
   "errors.AUTH_INVALID_PASSWORD": "Invalid password",
   "errors.AUTH_PERMISSION_DENIED": "Aapko ye action karne ki permission nahi hai",
+  "errors.AUTH_INVALID_CREDENTIALS": "Invalid credentials",
+  "errors.AUTH_EMAIL_NOT_FOUND": "Is email se koi account nahi mila",
+  "errors.FORM_INVALID": "Please required fields fill karo",
 
   "errors.ORG_NOT_FOUND": "Organization nahi mili",
   "errors.ORG_SLUG_EXISTS": "Organization slug pehle se exist karta hai",
@@ -82,6 +85,7 @@
 
   "success.AUTH_LOGIN_SUCCESS": "Login successful",
   "success.AUTH_SUCCESS": "Authentication successful",
+  "success.AUTH_FORGOT_SENT": "Password reset link aapke email pe bhej diya gaya hai",
   "success.USER_LISTED": "Users list ho gayi",
   "success.USER_CREATED": "User create ho gaya",
   "success.USER_UPDATED": "User update ho gaya",

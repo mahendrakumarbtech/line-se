@@ -10,11 +10,11 @@ async function adminAuth(req, res, next) {
 
         const decoded = verifyToken(header.split(" ")[1]);
 
-        let result = await adminAuthValidate(decoded.user_id);
-        if (result.status !== 1) {
-            return res.status(401).json(result);
+        const result = await adminAuthValidate(decoded.user_id);
+        if (result.error) {
+            return res.status(401).json(errorResponse(result.key));
         }
-        req.authUser = result.data;
+        req.authUser = result.user;
         next();
     } catch {
         return res.status(401).json(errorResponse("AUTH_TOKEN_INVALID"));
