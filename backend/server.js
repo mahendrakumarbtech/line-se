@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import models from "./models/index.js";
+import langMiddleware from "./middleware/lang.js";
 import adminRoutes from "./routes/admin.routes.js";
 import appRoutes from "./routes/app.routes.js";
 import webRoutes from "./routes/web.routes.js";
@@ -14,6 +15,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(langMiddleware);
 
 
 app.get("/api/health", (req, res) => {

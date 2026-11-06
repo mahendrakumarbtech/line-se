@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import jwt from "jsonwebtoken";
 import models from "../models/index.js";
 import { compare, hash } from "bcryptjs";
@@ -6,9 +7,9 @@ import {
 	getRoleType,
 	MESSAGE_CODES,
 	getMessageCode,
-	getMessageLabel,
-	errorResponse,
-	successResponse,
+	getMessageLabel as baseGetMessageLabel,
+	errorResponse as baseErrorResponse,
+	successResponse as baseSuccessResponse,
 	ADMIN_PERMISSIONS,
 	canAccess,
 	canAccessAny,
@@ -17,6 +18,33 @@ import {
 	APP_LANGUAGES
 } from "../../constants.mjs";
 
+const requestLang = new AsyncLocalStorage();
+const SUPPORTED_LANGS = new Set(APP_LANGUAGES.map((l) => l.key));
+
+export function resolveLang(raw) {
+	const code = String(raw || "en").split(",")[0].trim().toLowerCase();
+	return SUPPORTED_LANGS.has(code) ? code : "en";
+}
+
+export function getRequestLang() {
+	return requestLang.getStore() || "en";
+}
+
+export function runWithLang(lang, fn) {
+	return requestLang.run(resolveLang(lang), fn);
+}
+
+export function getMessageLabel(key, lang) {
+	return baseGetMessageLabel(key, lang || getRequestLang());
+}
+
+export function errorResponse(key, data, lang) {
+	return baseErrorResponse(key, data, lang || getRequestLang());
+}
+
+export function successResponse(data, keyOrMessage, lang) {
+	return baseSuccessResponse(data, keyOrMessage, lang || getRequestLang());
+}
 
 const CACHE_TTL = 5 * 60 * 1000;
 
@@ -263,14 +291,12 @@ export {
 	getRoleType,
 	MESSAGE_CODES,
 	getMessageCode,
-	getMessageLabel,
-	errorResponse,
-	successResponse,
 	ADMIN_PERMISSIONS,
 	canAccess,
 	canAccessAny,
 	canAccessAll,
 	LIMIT_PER_PAGE,
+	APP_LANGUAGES,
 	// helpers
 	signToken,
 	verifyToken,
