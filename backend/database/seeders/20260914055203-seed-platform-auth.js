@@ -2,7 +2,8 @@ import bcrypt from "bcryptjs";
 import { ROLE_TYPE_CODES, getRoleType, ADMIN_PERMISSIONS } from "../../utils/custom.js";
 
 
-const SUPER_ADMIN_EMAIL = "lineseadmin@mailinator.com";
+// Mailinator rejects local-parts containing "admin" (501 Bad Recipient)
+const SUPER_ADMIN_EMAIL = "linese@mailinator.com";
 const SUPER_ADMIN_PASSWORD = "Admin@123";
 
 export default {
