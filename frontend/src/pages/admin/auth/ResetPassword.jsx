@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import PasswordInput from "../../../components/common/PasswordInput";
 import FormField from "../../../components/common/FormField";
 import { notify } from "../../../components/common/toast";
+import { apiPost } from "../../../services/api";
+import { applyServerErrors } from "../../../utils/custom";
 
 export default function ResetPassword() {
   const { t } = useTranslation();
@@ -33,9 +35,17 @@ export default function ResetPassword() {
     }
 
     setSubmitting(true);
-    // TODO: apiPost("/admin/reset-password", { token, password })
+    const res = await apiPost("/admin/reset-password", { token, password, confirm });
     setSubmitting(false);
-    notify.success(t("auth.resetSuccess"));
+
+    if (res?.status !== 1) {
+      applyServerErrors(res, setErrors);
+      notify.error(res?.message || t("validation.formInvalid"));
+      return;
+    }
+
+    setErrors({});
+    notify.success(res.message || t("auth.resetSuccess"));
     navigate("/admin/login", { replace: true });
   };
 
@@ -59,6 +69,10 @@ export default function ResetPassword() {
       <h4 className="auth-title mb-1">{t("auth.resetTitle")}</h4>
       <p className="auth-subtitle mb-4">{t("auth.resetHint")}</p>
 
+      {errors.token ? (
+        <p className="text-danger small mb-3">{errors.token}</p>
+      ) : null}
+
       <form onSubmit={onSubmit} noValidate>
         <FormField label={t("auth.newPassword")} htmlFor="new-password" error={errors.password}>
           <PasswordInput
@@ -68,7 +82,7 @@ export default function ResetPassword() {
             placeholder={t("auth.newPasswordPlaceholder")}
             onChange={(e) => {
               setPassword(e.target.value);
-              setErrors((p) => ({ ...p, password: "" }));
+              setErrors((p) => ({ ...p, password: "", token: "" }));
             }}
           />
         </FormField>
@@ -81,7 +95,7 @@ export default function ResetPassword() {
             placeholder={t("auth.confirmPasswordPlaceholder")}
             onChange={(e) => {
               setConfirm(e.target.value);
-              setErrors((p) => ({ ...p, confirm: "" }));
+              setErrors((p) => ({ ...p, confirm: "", token: "" }));
             }}
           />
         </FormField>

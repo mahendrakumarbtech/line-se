@@ -34,6 +34,8 @@ export default (sequelize, DataTypes) => {
       latitude: { type: DataTypes.DECIMAL(10, 8), allowNull: true },
       longitude: { type: DataTypes.DECIMAL(11, 8), allowNull: true },
       status: { type: DataTypes.INTEGER, defaultValue: 0 },
+      reset_token: { type: DataTypes.STRING, allowNull: true },
+      reset_token_expires: { type: DataTypes.DATE, allowNull: true },
     },
     {
       tableName: "users",

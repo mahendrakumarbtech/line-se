@@ -3,7 +3,7 @@ import { Router } from "express";
 import { adminAuth } from "../middleware/adminAuth.js";
 import { adminPermission } from "../middleware/adminPermission.js";
 import { resourceRoute } from "../utils/routeHelper.js";
-import { adminLogin, adminRegister, dashboard, forgotPassword } from "../controllers/admin/authController.js";
+import { adminLogin, adminRegister, dashboard, forgotPassword, resetPassword } from "../controllers/admin/authController.js";
 import * as OrganizationController from "../controllers/admin/organizationController.js";
 import * as UserController from "../controllers/admin/userController.js";
 
@@ -12,6 +12,7 @@ const router = Router();
 router.post("/login", adminLogin);
 router.post("/register", adminRegister);
 router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 router.use(adminAuth);
 

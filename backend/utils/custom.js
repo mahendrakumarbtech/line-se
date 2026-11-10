@@ -1,5 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 import models from "../models/index.js";
 import { compare, hash } from "bcryptjs";
 import {
@@ -48,7 +49,7 @@ export function successResponse(data, keyOrMessage, lang) {
 
 const CACHE_TTL = 5 * 60 * 1000;
 
-const USER_SENSITIVE_FIELDS = ["password"];
+const USER_SENSITIVE_FIELDS = ["password", "reset_token", "reset_token_expires"];
 
 const hashPassword = async (password) => hash(password, 10);
 const verifyPassword = async (password, hashedPassword) => compare(password, hashedPassword);
@@ -291,6 +292,59 @@ const getUserWithPermissions = async (userId, roleId, organizationId) => {
 	return result;
 };
 
+let mailTransporterPromise = null;
+
+function hasSmtpConfig() {
+	return Boolean(process.env.MAIL_HOST && process.env.MAIL_FROM);
+}
+
+async function createMailTransporter() {
+	if (hasSmtpConfig()) {
+		return nodemailer.createTransport({
+			host: process.env.MAIL_HOST,
+			port: Number(process.env.MAIL_PORT || 587),
+			secure: String(process.env.MAIL_SECURE || "false") === "true",
+			auth:
+				process.env.MAIL_USER && process.env.MAIL_PASS
+					? { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS }
+					: undefined,
+		});
+	}
+
+	// Dev fallback jab SMTP set na ho — Ethereal preview URL log me aati hai
+	const testAccount = await nodemailer.createTestAccount();
+	console.log("[mail] SMTP missing — using Ethereal test account:", testAccount.user);
+	return nodemailer.createTransport({
+		host: testAccount.smtp.host,
+		port: testAccount.smtp.port,
+		secure: testAccount.smtp.secure,
+		auth: { user: testAccount.user, pass: testAccount.pass },
+	});
+}
+
+async function getMailTransporter() {
+	if (!mailTransporterPromise) {
+		mailTransporterPromise = createMailTransporter();
+	}
+	return mailTransporterPromise;
+}
+
+/** Send mail. Template body controller / future template store se aayega. */
+async function sendMail({ to, subject, html, text }) {
+	const transporter = await getMailTransporter();
+	const info = await transporter.sendMail({
+		from: process.env.MAIL_FROM || '"LineSe" <noreply@linese.local>',
+		to,
+		subject,
+		html,
+		text: text || String(html || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
+	});
+
+	const previewUrl = nodemailer.getTestMessageUrl(info) || undefined;
+	if (previewUrl) console.log("[mail] Ethereal preview:", previewUrl);
+
+	return { messageId: info.messageId, previewUrl };
+}
 
 export {
 	// constants re-export
@@ -318,4 +372,6 @@ export {
 	hashPassword,
 	verifyPassword,
 	USER_SENSITIVE_FIELDS,
+	sendMail,
+	hasSmtpConfig,
 }
