@@ -24,6 +24,7 @@ import {
 	findLabel,
 	getExportType,
 	EXPORT_MAX_ROWS,
+	slugify,
 } from "../../constants.mjs";
 
 const requestLang = new AsyncLocalStorage();
@@ -440,6 +441,7 @@ export {
 	STATUS_OPTIONS,
 	ORGANIZATION_TYPE_CODES,
 	findLabel,
+	slugify,
 	EXPORT_MAX_ROWS,
 	getPagination,
 	sendExport,

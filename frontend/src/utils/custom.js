@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import {
   canAccess,
   LIMIT_PER_PAGE,
@@ -7,6 +9,8 @@ import {
   getMessageLabel,
   findLabel,
   EXPORT_TYPE_CODES,
+  THEME_OPTIONS,
+  slugify,
 } from "../../../constants.mjs";
 
 const STORAGE_PREFIX = "linese_";
@@ -123,12 +127,6 @@ export const STORAGE_KEYS = {
 };
 
 // ---------- theme (light / dark / system) ----------
-export const THEME_OPTIONS = [
-  { key: "light", label: "Light" },
-  { key: "dark", label: "Dark" },
-  { key: "system", label: "System" },
-];
-
 const systemDarkQuery = () => window.matchMedia("(prefers-color-scheme: dark)");
 
 export function getTheme() {
@@ -239,13 +237,30 @@ export function getPageItems(totalPages, current) {
   return items;
 }
 
-export function slugify(value) {
-  return String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
+// ---------- toast / confirm ----------
+export const notify = {
+  success: (msg) => toast.success(msg),
+  error: (msg) => toast.error(msg),
+  warning: (msg) => toast.warning(msg),
+  info: (msg) => toast.info(msg),
+};
+
+export function confirmAction({
+  title = "Are you sure?",
+  text = "",
+  confirmText = "Yes",
+  cancelText = "Cancel",
+  icon = "warning",
+} = {}) {
+  return Swal.fire({
+    title,
+    text,
+    icon,
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    confirmButtonColor: "#696cff",
+  }).then((r) => r.isConfirmed);
 }
 
 export {
@@ -257,4 +272,6 @@ export {
   getMessageLabel,
   findLabel,
   EXPORT_TYPE_CODES,
+  THEME_OPTIONS,
+  slugify,
 };

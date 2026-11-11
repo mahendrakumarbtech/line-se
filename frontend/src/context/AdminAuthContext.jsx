@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { apiPost } from "../services/api";
+import { apiRequest } from "../services/api";
 import {
   getAdminToken,
   setAdminToken,
@@ -26,7 +26,7 @@ export function AdminAuthProvider({ children }) {
       const cached = await getAdminUser(token);
       if (cached) setUser(cached);
 
-      const res = await apiPost("/admin/dashboard", {}, { token });
+      const res = await apiRequest("/admin/dashboard", {}, { token });
       if (res?.status === 1) {
         setUser(res.data);
         await setAdminUser(res.data, token);
@@ -41,7 +41,7 @@ export function AdminAuthProvider({ children }) {
   }, [token]);
 
   const login = async (email, password) => {
-    const res = await apiPost("/admin/login", { email, password });
+    const res = await apiRequest("/admin/login", { email, password });
     if (res?.status !== 1) {
       return {
         status: 0,

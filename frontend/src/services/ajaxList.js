@@ -1,4 +1,4 @@
-import { apiPost } from "./api";
+import { apiRequest } from "./api";
 import { getAdminToken } from "../utils/custom";
 
 export function mapAjaxRowToOption(row) {
@@ -13,7 +13,7 @@ export function mapAjaxRowToOption(row) {
 
 export async function fetchAjaxListOptions({ type, q = "", id = [], extra = {} } = {}) {
   const token = getAdminToken();
-  const res = await apiPost(
+  const res = await apiRequest(
     "/admin/ajax-list",
     { type, q, id: Array.isArray(id) ? id : id ? [id] : [], ...extra },
     { token }

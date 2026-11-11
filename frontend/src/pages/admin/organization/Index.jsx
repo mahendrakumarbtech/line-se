@@ -13,9 +13,7 @@ import {
 import ListPaginationBar from "../../../components/common/ListPaginationBar";
 import AsyncSearchSelect from "../../../components/common/AsyncSearchSelect";
 import OrganizationFormModal from "./FormModal";
-import { notify } from "../../../components/common/toast";
-import { confirmAction } from "../../../components/common/swal";
-import { apiDownload, apiPost } from "../../../services/api";
+import { apiRequest } from "../../../services/api";
 import { useAdminAuth } from "../../../context/AdminAuthContext";
 import {
   canAccess,
@@ -24,6 +22,8 @@ import {
   LIMIT_PER_PAGE,
   ORGANIZATION_TYPE_CODES,
   STATUS_OPTIONS,
+  notify,
+  confirmAction,
 } from "../../../utils/custom";
 
 const EMPTY_FILTERS = { search: "", status: null };
@@ -63,7 +63,7 @@ export default function OrganizationsIndex() {
 
   const onExport = async (type) => {
     setExporting(true);
-    const res = await apiDownload(
+    const res = await apiRequest(
       "/admin/organizations/export",
       { filter: buildFilter(), type },
       { token, filename: `organizations-${tab}` }
@@ -75,7 +75,7 @@ export default function OrganizationsIndex() {
   const load = async () => {
     setLoading(true);
     setError("");
-    const res = await apiPost(
+    const res = await apiRequest(
       "/admin/organizations/index",
       { filter: buildFilter(), page, limit: LIMIT_PER_PAGE },
       { token }
@@ -116,7 +116,7 @@ export default function OrganizationsIndex() {
   };
 
   const runAction = async (url, row, fallbackSuccess, fallbackError) => {
-    const res = await apiPost(url, { id: row.id }, { token });
+    const res = await apiRequest(url, { id: row.id }, { token });
     if (res?.status !== 1) {
       notify.error(res?.message || fallbackError);
       return;

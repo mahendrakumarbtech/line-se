@@ -22,6 +22,9 @@ When building or changing **admin** frontend (`frontend/src/components/admin`, `
 - Add / Edit alag page pe nahi — list page pe `components/common/Modal` me (`pages/admin/<Module>/FormModal.jsx`), save ke baad list `load()`.
 - List me ID nahi, **Sr No** (`(page - 1) * limit + idx + 1`).
 - Export hamesha server-side: controller me `EXPORT_HEADERS` + `exportList` (list wala hi query builder) → backend `sendExport(res, { headers, data, filename, type })`. Frontend `apiDownload` + `EXPORT_TYPE_CODES` dropdown.
+- Naming: folders lowercase (`pages/admin/organization`, `auth`); React component files PascalCase `.jsx`; non-component JS camelCase `.js`.
+- API calls sirf `apiRequest(path, body, { token, method })` (`services/api.js`) — JSON ho ya file, dono handle.
+- Toast / confirm: `notify`, `confirmAction` from `utils/custom.js`. Frontend + backend dono me kaam aane wale constants/pure helpers root `constants.mjs` me.
 - Shared frontend helpers (pagination, CSV export, labels, theme, initials) sirf `utils/custom.js` me; pehle wahan dekho, duplicate mat banao.
 - Do **not** invent a different admin theme (no dark sidebar by default, no unrelated purple gradients, no flat grey boxes without Sneat card look).
 - Auth pages stay on `AuthLayout` + `auth.css` (same palette).

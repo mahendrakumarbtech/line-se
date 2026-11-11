@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiBriefcase, FiCheckCircle, FiUsers, FiActivity } from "react-icons/fi";
 import { useAdminAuth } from "../../context/AdminAuthContext";
-import { apiPost } from "../../services/api";
+import { apiRequest } from "../../services/api";
 import { canAccess, LIMIT_PER_PAGE } from "../../utils/custom";
 
 export default function Dashboard() {
@@ -15,8 +15,8 @@ export default function Dashboard() {
     let alive = true;
     (async () => {
       const [allRes, activeRes] = await Promise.all([
-        apiPost("/admin/organizations/index", { page: 1, limit: LIMIT_PER_PAGE, filter: {} }, { token }),
-        apiPost("/admin/organizations/index", { page: 1, limit: 1, filter: { status: 1 } }, { token }),
+        apiRequest("/admin/organizations/index", { page: 1, limit: LIMIT_PER_PAGE, filter: {} }, { token }),
+        apiRequest("/admin/organizations/index", { page: 1, limit: 1, filter: { status: 1 } }, { token }),
       ]);
       if (!alive) return;
       if (allRes?.status === 1) setOrgTotal(allRes.data?.total ?? 0);

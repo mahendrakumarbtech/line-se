@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { notify } from "../../../components/common/toast";
 import FormField from "../../../components/common/FormField";
-import { apiPost } from "../../../services/api";
-import { applyServerErrors } from "../../../utils/custom";
+import { apiRequest } from "../../../services/api";
+import { applyServerErrors, notify } from "../../../utils/custom";
 
 export default function ForgotPassword() {
   const { t } = useTranslation();
@@ -26,7 +25,7 @@ export default function ForgotPassword() {
     }
 
     setSubmitting(true);
-    const res = await apiPost("/admin/forgot-password", { email: email.trim().toLowerCase() });
+    const res = await apiRequest("/admin/forgot-password", { email: email.trim().toLowerCase() });
     setSubmitting(false);
 
     if (res?.status !== 1) {

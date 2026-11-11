@@ -8,6 +8,7 @@ import {
   sendExport,
   findLabel,
   formatDateTime,
+  slugify,
   STATUS_OPTIONS,
   ORGANIZATION_TYPE_CODES,
   EXPORT_MAX_ROWS,
@@ -96,17 +97,18 @@ async function view(req, res) {
 }
 
 async function add(req, res) {
-  const { name, slug, type, status } = req.body;
+  const { name, type, status } = req.body;
+  const slug = slugify(req.body.slug);
   const errors = {};
 
   if (!name?.trim()) errors.name = getMessageLabel("ORG_NAME_REQUIRED");
-  if (!slug?.trim()) errors.slug = getMessageLabel("ORG_SLUG_REQUIRED");
+  if (!slug) errors.slug = getMessageLabel("ORG_SLUG_REQUIRED");
   if (type === undefined || type === null || type === "") {
     errors.type = getMessageLabel("ORG_TYPE_REQUIRED");
   }
 
-  if (slug?.trim() && !errors.slug) {
-    const exists = await models.Organization.findOne({ where: { slug: slug.trim() } });
+  if (slug) {
+    const exists = await models.Organization.findOne({ where: { slug }, paranoid: false });
     if (exists) errors.slug = getMessageLabel("ORG_SLUG_EXISTS");
   }
 
@@ -117,7 +119,7 @@ async function add(req, res) {
   try {
     const organization = await models.Organization.create({
       name: name.trim(),
-      slug: slug.trim(),
+      slug,
       type: Number(type),
       status: status === undefined || status === null || status === "" ? 1 : Number(status),
     });
@@ -128,7 +130,8 @@ async function add(req, res) {
 }
 
 async function edit(req, res) {
-  const { id, name, slug, type, status } = req.body;
+  const { id, name, type, status } = req.body;
+  const slug = slugify(req.body.slug);
   const errors = {};
 
   if (!id) errors.id = getMessageLabel("ORG_ID_REQUIRED");
@@ -140,13 +143,14 @@ async function edit(req, res) {
   }
 
   if (!name?.trim()) errors.name = getMessageLabel("ORG_NAME_REQUIRED");
-  if (!slug?.trim()) errors.slug = getMessageLabel("ORG_SLUG_REQUIRED");
+  if (!slug) errors.slug = getMessageLabel("ORG_SLUG_REQUIRED");
   if (type === undefined || type === null || type === "") {
     errors.type = getMessageLabel("ORG_TYPE_REQUIRED");
   }
-  if (slug?.trim() && !errors.slug) {
+  if (slug) {
     const exists = await models.Organization.findOne({
-      where: { slug: slug.trim(), id: { [Op.ne]: id } },
+      where: { slug, id: { [Op.ne]: id } },
+      paranoid: false,
     });
     if (exists) errors.slug = getMessageLabel("ORG_SLUG_EXISTS");
   }
@@ -157,7 +161,7 @@ async function edit(req, res) {
   try {
     await organization.update({
       name: name.trim(),
-      slug: slug.trim(),
+      slug,
       type: Number(type),
       ...(status !== undefined && status !== null && status !== ""
         ? { status: Number(status) }

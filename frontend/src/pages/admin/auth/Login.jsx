@@ -3,9 +3,8 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAdminAuth } from "../../../context/AdminAuthContext";
 import PasswordInput from "../../../components/common/PasswordInput";
-import { notify } from "../../../components/common/toast";
 import FormField from "../../../components/common/FormField";
-import { applyServerErrors } from "../../../utils/custom";
+import { applyServerErrors, notify } from "../../../utils/custom";
 
 export default function Login() {
   const { t } = useTranslation();

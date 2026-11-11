@@ -7,7 +7,7 @@ import ForgotPassword from "./pages/admin/auth/ForgotPassword";
 import ResetPassword from "./pages/admin/auth/ResetPassword";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./components/admin/AdminLayout";
-import OrganizationsIndex from "./pages/admin/Organization/Index";
+import OrganizationsIndex from "./pages/admin/organization/Index";
 
 
 export default function App() {

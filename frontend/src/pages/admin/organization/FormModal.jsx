@@ -2,14 +2,14 @@ import { useState } from "react";
 import Modal from "../../../components/common/Modal";
 import FormField from "../../../components/common/FormField";
 import AsyncSearchSelect from "../../../components/common/AsyncSearchSelect";
-import { notify } from "../../../components/common/toast";
-import { apiPost } from "../../../services/api";
+import { apiRequest } from "../../../services/api";
 import { useAdminAuth } from "../../../context/AdminAuthContext";
 import {
   applyServerErrors,
   ORGANIZATION_TYPE_CODES,
   STATUS_OPTIONS,
   slugify,
+  notify,
 } from "../../../utils/custom";
 
 /** row = null → add; row = list row → edit. onSaved() after success (list reloads). */
@@ -44,7 +44,7 @@ export default function OrganizationFormModal({ row, onClose, onSaved }) {
     }
 
     setSubmitting(true);
-    const res = await apiPost(
+    const res = await apiRequest(
       isEdit ? "/admin/organizations/edit" : "/admin/organizations/add",
       { ...(isEdit ? { id: row.id } : {}), ...form, name: form.name.trim(), slug: form.slug.trim() },
       { token }

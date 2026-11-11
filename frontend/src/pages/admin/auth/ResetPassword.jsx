@@ -3,9 +3,8 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PasswordInput from "../../../components/common/PasswordInput";
 import FormField from "../../../components/common/FormField";
-import { notify } from "../../../components/common/toast";
-import { apiPost } from "../../../services/api";
-import { applyServerErrors } from "../../../utils/custom";
+import { apiRequest } from "../../../services/api";
+import { applyServerErrors, notify } from "../../../utils/custom";
 
 export default function ResetPassword() {
   const { t } = useTranslation();
@@ -35,7 +34,7 @@ export default function ResetPassword() {
     }
 
     setSubmitting(true);
-    const res = await apiPost("/admin/reset-password", { token, password, confirm });
+    const res = await apiRequest("/admin/reset-password", { token, password, confirm });
     setSubmitting(false);
 
     if (res?.status !== 1) {

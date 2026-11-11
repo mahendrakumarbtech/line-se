@@ -230,6 +230,20 @@ const getExportType = (key) => EXPORT_TYPE_CODES.find((item) => item.key === key
 
 const EXPORT_MAX_ROWS = 50000;
 
+const THEME_OPTIONS = Object.freeze([
+  { key: "light", label: "Light" },
+  { key: "dark", label: "Dark" },
+  { key: "system", label: "System" },
+]);
+
+const slugify = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+
 const APP_LANGUAGES = [
   { key: "en", label: "English" },
   { key: "hi", label: "हिन्दी" },
@@ -256,6 +270,8 @@ export {
   EXPORT_TYPE_CODES,
   getExportType,
   EXPORT_MAX_ROWS,
+  THEME_OPTIONS,
+  slugify,
   APP_LANGUAGES,
 };
 
