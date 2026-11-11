@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import { FiBriefcase, FiChevronLeft, FiChevronRight, FiHome } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import { canAccess } from "../../utils/custom";
 
-/** Multi-level: any item may have `children` (any depth). Leaf needs `to`. */
+/** Multi-level: any item may have `children` (any depth). Leaf needs `to`. `label` is an i18n key. */
 const MENU = [
   {
-    header: "Admin",
+    header: "menu.admin",
     items: [
-      { label: "Dashboard", to: "/admin/dashboard", icon: FiHome, permission: "dashboard.view" },
-      { label: "Organizations", to: "/admin/organizations", icon: FiBriefcase, permission: "organization.view" },
+      { label: "menu.dashboard", to: "/admin/dashboard", icon: FiHome, permission: "dashboard.view" },
+      { label: "menu.organizations", to: "/admin/organizations", icon: FiBriefcase, permission: "organization.view" },
     ],
   },
 ];
@@ -35,7 +36,7 @@ function MenuIcon({ icon: Icon }) {
   return <span className="menu-icon">{Icon ? <Icon /> : <span className="menu-bullet" />}</span>;
 }
 
-function MenuItem({ item, pathname, onNavigate }) {
+function MenuItem({ item, pathname, onNavigate, label, t }) {
   const [manualOpen, setManualOpen] = useState(null);
 
   if (!item.children) {
@@ -45,11 +46,11 @@ function MenuItem({ item, pathname, onNavigate }) {
           to={item.to}
           end
           className={({ isActive }) => `menu-link${isActive ? " active" : ""}`}
-          title={item.label}
+          title={label}
           onClick={onNavigate}
         >
           <MenuIcon icon={item.icon} />
-          <span className="menu-link-text">{item.label}</span>
+          <span className="menu-link-text">{label}</span>
         </NavLink>
       </li>
     );
@@ -67,27 +68,28 @@ function MenuItem({ item, pathname, onNavigate }) {
         onClick={() => setManualOpen(!open)}
       >
         <MenuIcon icon={item.icon} />
-        <span className="menu-link-text">{item.label}</span>
+        <span className="menu-link-text">{label}</span>
         <FiChevronRight className="menu-arrow" />
       </button>
       {open ? (
-        <MenuList items={item.children} pathname={pathname} onNavigate={onNavigate} className="menu-sub" />
+        <MenuList items={item.children} pathname={pathname} onNavigate={onNavigate} className="menu-sub" t={t} />
       ) : null}
     </li>
   );
 }
 
-function MenuList({ items, pathname, onNavigate, className = "" }) {
+function MenuList({ items, pathname, onNavigate, className = "", t }) {
   return (
     <ul className={`list-unstyled mb-0 ${className}`}>
       {items.map((item) => (
-        <MenuItem key={item.label} item={item} pathname={pathname} onNavigate={onNavigate} />
+        <MenuItem key={item.label} item={item} label={t(item.label)} pathname={pathname} onNavigate={onNavigate} t={t} />
       ))}
     </ul>
   );
 }
 
 export default function AdminSidebar({ user, collapsed, mobileOpen, onToggleCollapsed, onCloseMobile }) {
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const [flyout, setFlyout] = useState(null);
   const flyoutRef = useRef(null);
@@ -116,7 +118,7 @@ export default function AdminSidebar({ user, collapsed, mobileOpen, onToggleColl
   };
 
   const renderRailItem = (item) => {
-    if (!item.children) return <MenuItem key={item.label} item={item} pathname={pathname} />;
+    if (!item.children) return <MenuItem key={item.label} item={item} label={t(item.label)} pathname={pathname} t={t} />;
     const Icon = item.icon;
     const isOpen = activeFlyout?.item.label === item.label;
     return (
@@ -125,7 +127,7 @@ export default function AdminSidebar({ user, collapsed, mobileOpen, onToggleColl
           type="button"
           data-rail-trigger
           className={`menu-link menu-toggle${isItemActive(item, pathname) ? " active-parent" : ""}${isOpen ? " flyout-open" : ""}`}
-          title={item.label}
+          title={t(item.label)}
           aria-expanded={isOpen}
           onClick={(e) => toggleFlyout(item, e)}
         >
@@ -143,7 +145,7 @@ export default function AdminSidebar({ user, collapsed, mobileOpen, onToggleColl
         <button
           type="button"
           className="layout-menu-toggle d-none d-lg-inline-flex"
-          aria-label={collapsed ? "Expand menu" : "Collapse menu"}
+          aria-label={collapsed ? t("menu.expand") : t("menu.collapse")}
           onClick={onToggleCollapsed}
         >
           {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
@@ -153,11 +155,11 @@ export default function AdminSidebar({ user, collapsed, mobileOpen, onToggleColl
       <ul className="menu-inner">
         {groups.map((group) => (
           <li key={group.header}>
-            <div className="menu-header">{group.header}</div>
+            <div className="menu-header">{t(group.header)}</div>
             {rail ? (
               <ul className="list-unstyled mb-0">{group.items.map(renderRailItem)}</ul>
             ) : (
-              <MenuList items={group.items} pathname={pathname} onNavigate={onCloseMobile} />
+              <MenuList items={group.items} pathname={pathname} onNavigate={onCloseMobile} t={t} />
             )}
           </li>
         ))}
@@ -166,8 +168,8 @@ export default function AdminSidebar({ user, collapsed, mobileOpen, onToggleColl
       {activeFlyout
         ? createPortal(
             <div ref={flyoutRef} className="menu-flyout" style={{ top: activeFlyout.top }}>
-              <div className="menu-flyout-title">{activeFlyout.item.label}</div>
-              <MenuList items={activeFlyout.item.children} pathname={pathname} onNavigate={() => setFlyout(null)} />
+              <div className="menu-flyout-title">{t(activeFlyout.item.label)}</div>
+              <MenuList items={activeFlyout.item.children} pathname={pathname} onNavigate={() => setFlyout(null)} t={t} />
             </div>,
             document.body
           )

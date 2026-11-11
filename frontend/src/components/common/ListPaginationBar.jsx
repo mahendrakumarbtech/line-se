@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { getPageItems, getTotalPages } from "../../utils/custom";
 
 export default function ListPaginationBar({
@@ -9,6 +10,7 @@ export default function ListPaginationBar({
   loading = false,
   ariaLabel = "Pagination",
 }) {
+  const { t } = useTranslation();
   const pages = totalPages != null ? totalPages : getTotalPages(total, pageSize);
   const safePage = Math.min(Math.max(1, Number(page) || 1), pages);
   const from = total > 0 ? (safePage - 1) * pageSize + 1 : 0;
@@ -34,12 +36,10 @@ export default function ListPaginationBar({
     <div className="ls-pager d-flex align-items-center justify-content-between flex-wrap gap-2 px-3 py-3">
       {total > 0 ? (
         <span className="text-muted-ls small">
-          Showing <strong className="text-heading">{from}</strong> to{" "}
-          <strong className="text-heading">{to}</strong> of{" "}
-          <strong className="text-heading">{total}</strong> results
+          {t("common.showing", { from, to, total })}
         </span>
       ) : (
-        <span className="text-muted-ls small">0 results</span>
+        <span className="text-muted-ls small">{t("common.noResults")}</span>
       )}
       {total > 0 ? (
         <nav aria-label={ariaLabel}>

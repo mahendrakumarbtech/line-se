@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FiBriefcase, FiCheckCircle, FiUsers, FiActivity } from "react-icons/fi";
 import { useAdminAuth } from "../../context/AdminAuthContext";
 import { apiRequest } from "../../services/api";
 import { canAccess, LIMIT_PER_PAGE } from "../../utils/custom";
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user, token } = useAdminAuth();
   const [orgTotal, setOrgTotal] = useState(null);
   const [orgActive, setOrgActive] = useState(null);
@@ -30,10 +32,10 @@ export default function Dashboard() {
   const firstName = String(user?.name || "Admin").split(" ")[0];
 
   const stats = [
-    { label: "Organizations", value: orgTotal, icon: FiBriefcase, tone: "primary" },
-    { label: "Active Orgs", value: orgActive, icon: FiCheckCircle, tone: "success" },
-    { label: "Role", value: user?.role?.name, icon: FiUsers, tone: "info", fontSize: "1.15rem" },
-    { label: "Account", value: user?.email, icon: FiActivity, tone: "warning", fontSize: "1.05rem" },
+    { label: t("dash.organizations"), value: orgTotal, icon: FiBriefcase, tone: "primary" },
+    { label: t("dash.activeOrgs"), value: orgActive, icon: FiCheckCircle, tone: "success" },
+    { label: t("dash.role"), value: user?.role?.name, icon: FiUsers, tone: "info", fontSize: "1.15rem" },
+    { label: t("dash.account"), value: user?.email, icon: FiActivity, tone: "warning", fontSize: "1.05rem" },
   ];
 
   return (
@@ -42,13 +44,11 @@ export default function Dashboard() {
         <div className="card dash-welcome">
           <div className="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div>
-              <h4>Welcome back, {firstName}! 🎉</h4>
-              <p className="mb-3 text-muted-ls">
-                LineSe admin panel — manage organizations, users, and queue operations from one place.
-              </p>
+              <h4>{t("dash.welcome", { name: firstName })} 🎉</h4>
+              <p className="mb-3 text-muted-ls">{t("dash.subtitle")}</p>
               {canAccess(user, "organization.view") ? (
                 <Link to="/admin/organizations" className="btn btn-sm btn-primary">
-                  View Organizations
+                  {t("dash.viewOrgs")}
                 </Link>
               ) : null}
             </div>

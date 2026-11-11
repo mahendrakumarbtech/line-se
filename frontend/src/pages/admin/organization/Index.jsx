@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FiChevronDown,
   FiDownload,
   FiEdit2,
+  FiEye,
   FiFilter,
   FiMoreVertical,
   FiPlus,
   FiRefreshCw,
   FiRotateCcw,
+  FiToggleLeft,
   FiTrash2,
 } from "react-icons/fi";
 import ListPaginationBar from "../../../components/common/ListPaginationBar";
 import AsyncSearchSelect from "../../../components/common/AsyncSearchSelect";
+import Modal from "../../../components/common/Modal";
+import FormField from "../../../components/common/FormField";
 import OrganizationFormModal from "./FormModal";
+import OrganizationViewModal from "./ViewModal";
 import { apiRequest } from "../../../services/api";
 import { useAdminAuth } from "../../../context/AdminAuthContext";
 import {
@@ -28,17 +34,25 @@ import {
 
 const EMPTY_FILTERS = { search: "", status: null };
 
-const typeLabel = (value) => findLabel(ORGANIZATION_TYPE_CODES, value);
-const statusLabel = (value) => findLabel(STATUS_OPTIONS, value, { valueKey: "id", labelKey: "text" });
-
+const typeLabel = (value, t) => {
+  const key = findLabel(ORGANIZATION_TYPE_CODES, value, { labelKey: "key" });
+  return key && key !== value ? t(`orgType.${key}`) : value;
+};
+const statusLabel = (value, t) => t(Number(value) === 1 ? "status.active" : "status.inactive");
 
 export default function OrganizationsIndex() {
+  const { t } = useTranslation();
   const { token, user } = useAdminAuth();
 
   const canCreate = canAccess(user, "organization.create");
   const canUpdate = canAccess(user, "organization.update");
   const canDelete = canAccess(user, "organization.delete");
+  const canChangeStatus = canAccess(user, "organization.change-status");
   const canManageDelete = canAccess(user, "organization.manage-delete");
+  const statusOptions = STATUS_OPTIONS.map((s) => ({
+    ...s,
+    text: t(Number(s.id) === 1 ? "status.active" : "status.inactive"),
+  }));
 
   const [tab, setTab] = useState("active");
   const [rows, setRows] = useState([]);
@@ -51,9 +65,13 @@ export default function OrganizationsIndex() {
   const [error, setError] = useState("");
   const [exporting, setExporting] = useState(false);
   const [formRow, setFormRow] = useState(undefined);
+  const [viewRow, setViewRow] = useState(null);
+  const [statusRow, setStatusRow] = useState(null);
+  const [statusValue, setStatusValue] = useState(1);
+  const [statusBusy, setStatusBusy] = useState(false);
 
   const isTrashed = tab === "trashed";
-  const showActions = isTrashed ? canManageDelete : canUpdate || canDelete;
+  const showActions = true;
 
   const buildFilter = () => ({
     search: filters.search || undefined,
@@ -69,7 +87,7 @@ export default function OrganizationsIndex() {
       { token, filename: `organizations-${tab}` }
     );
     setExporting(false);
-    if (res?.status !== 1) notify.error(res?.message || "Export failed");
+    if (res?.status !== 1) notify.error(res?.message || t("org.exportFailed"));
   };
 
   const load = async () => {
@@ -82,7 +100,7 @@ export default function OrganizationsIndex() {
     );
     setLoading(false);
     if (res?.status !== 1) {
-      setError(res?.message || "Failed to load");
+      setError(res?.message || t("org.loadFailed"));
       setRows([]);
       setTotal(0);
       return;
@@ -127,31 +145,56 @@ export default function OrganizationsIndex() {
 
   const onSoftDelete = async (row) => {
     const ok = await confirmAction({
-      title: `Delete "${row.name}"?`,
-      text: "Organization will move to Deleted tab.",
-      confirmText: "Delete",
+      title: t("org.deleteTitle", { name: row.name }),
+      text: t("org.deleteText"),
+      confirmText: t("org.delete"),
+      cancelText: t("common.cancel"),
     });
-    if (ok) runAction("/admin/organizations/delete", row, "Organization deleted", "Delete failed");
+    if (ok) runAction("/admin/organizations/delete", row, t("success.ORG_DELETED"), t("org.saveFailed"));
   };
 
   const onForceDelete = async (row) => {
     const ok = await confirmAction({
-      title: `Permanently delete "${row.name}"?`,
-      text: "This cannot be undone.",
-      confirmText: "Delete forever",
+      title: t("org.deleteForeverTitle", { name: row.name }),
+      text: t("org.deleteForeverText"),
+      confirmText: t("org.deleteForever"),
+      cancelText: t("common.cancel"),
     });
-    if (ok) runAction("/admin/organizations/force-delete", row, "Organization permanently deleted", "Delete failed");
+    if (ok) runAction("/admin/organizations/force-delete", row, t("success.ORG_PERMANENTLY_DELETED"), t("org.saveFailed"));
   };
 
   const onRestore = (row) =>
-    runAction("/admin/organizations/restore", row, "Organization restored", "Restore failed");
+    runAction("/admin/organizations/restore", row, t("success.ORG_RESTORED"), t("org.saveFailed"));
+
+  const openStatus = (row) => {
+    setStatusValue(row.status ?? 1);
+    setStatusRow(row);
+  };
+
+  const saveStatus = async (e) => {
+    e.preventDefault();
+    setStatusBusy(true);
+    const res = await apiRequest(
+      "/admin/organizations/change-status",
+      { id: statusRow.id, status: statusValue },
+      { token }
+    );
+    setStatusBusy(false);
+    if (res?.status !== 1) {
+      notify.error(res?.message || t("org.saveFailed"));
+      return;
+    }
+    notify.success(res.message || t("success.ORG_STATUS_CHANGED"));
+    setStatusRow(null);
+    load();
+  };
 
   const colSpan = showActions ? 6 : 5;
 
   return (
     <>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-        <h4 className="page-title">Organizations</h4>
+        <h4 className="page-title">{t("org.title")}</h4>
         {canCreate ? (
           <button
             type="button"
@@ -160,7 +203,7 @@ export default function OrganizationsIndex() {
             tabIndex={isTrashed ? -1 : undefined}
             onClick={() => setFormRow(null)}
           >
-            <FiPlus className="me-1" /> Add Organization
+            <FiPlus className="me-1" /> {t("org.add")}
           </button>
         ) : null}
       </div>
@@ -174,7 +217,7 @@ export default function OrganizationsIndex() {
                 className={`nav-link ${!isTrashed ? "active" : ""}`}
                 onClick={() => switchTab("active")}
               >
-                Active
+                {t("status.active")}
               </button>
             </li>
             {canManageDelete ? (
@@ -184,7 +227,7 @@ export default function OrganizationsIndex() {
                   className={`nav-link ${isTrashed ? "active" : ""}`}
                   onClick={() => switchTab("trashed")}
                 >
-                  Deleted
+                  {t("org.deletedTab")}
                 </button>
               </li>
             ) : null}
@@ -196,7 +239,7 @@ export default function OrganizationsIndex() {
               className={`btn btn-sm ${filterOpen ? "btn-primary" : "btn-outline-secondary"}`}
               onClick={() => setFilterOpen((v) => !v)}
             >
-              <FiFilter className="me-1" /> Filter
+              <FiFilter className="me-1" /> {t("org.filter")}
               <FiChevronDown className={`ms-1 ls-filter-chevron ${filterOpen ? "open" : ""}`} />
             </button>
             <button
@@ -205,7 +248,7 @@ export default function OrganizationsIndex() {
               onClick={load}
               disabled={loading}
             >
-              <FiRefreshCw className={`me-1 ${loading ? "ls-spin" : ""}`} /> Refresh
+              <FiRefreshCw className={`me-1 ${loading ? "ls-spin" : ""}`} /> {t("org.refresh")}
             </button>
             <div className="dropdown">
               <button
@@ -215,7 +258,7 @@ export default function OrganizationsIndex() {
                 aria-expanded="false"
                 disabled={loading || exporting || !total}
               >
-                <FiDownload className={`me-1 ${exporting ? "ls-spin" : ""}`} /> Export
+                <FiDownload className={`me-1 ${exporting ? "ls-spin" : ""}`} /> {t("org.export")}
               </button>
               <div className="dropdown-menu dropdown-menu-end">
                 {EXPORT_TYPE_CODES.map((t) => (
@@ -232,29 +275,29 @@ export default function OrganizationsIndex() {
           <form className="card-body border-bottom" onSubmit={onApplyFilters}>
             <div className="row g-3 align-items-end">
               <div className="col-12 col-md-4">
-                <label className="form-label" htmlFor="org-filter-search">Search</label>
+                <label className="form-label" htmlFor="org-filter-search">{t("org.search")}</label>
                 <input
                   id="org-filter-search"
                   className="form-control"
                   value={draft.search}
                   onChange={(e) => setDraft((d) => ({ ...d, search: e.target.value }))}
-                  placeholder="Name / slug"
+                  placeholder={t("org.searchPlaceholder")}
                 />
               </div>
               <div className="col-12 col-md-3">
-                <label className="form-label" htmlFor="org-filter-status">Status</label>
+                <label className="form-label" htmlFor="org-filter-status">{t("org.status")}</label>
                 <AsyncSearchSelect
                   inputId="org-filter-status"
-                  options={STATUS_OPTIONS}
+                  options={statusOptions}
                   value={draft.status}
-                  placeholder="All"
+                  placeholder={t("common.all")}
                   onChange={(v) => setDraft((d) => ({ ...d, status: v }))}
                 />
               </div>
               <div className="col-12 col-md-auto d-flex gap-2">
-                <button type="submit" className="btn btn-primary">Apply</button>
+                <button type="submit" className="btn btn-primary">{t("common.apply")}</button>
                 <button type="button" className="btn btn-outline-secondary" onClick={onResetFilters}>
-                  Reset
+                  {t("common.reset")}
                 </button>
               </div>
             </div>
@@ -267,30 +310,30 @@ export default function OrganizationsIndex() {
           <table className="table">
             <thead>
               <tr>
-                <th>Sr No</th>
-                <th>Name</th>
-                <th>Slug</th>
-                <th>Type</th>
-                <th>Status</th>
-                {showActions ? <th className="text-end">Actions</th> : null}
+                <th>{t("org.srNo")}</th>
+                <th>{t("org.name")}</th>
+                <th>{t("org.slug")}</th>
+                <th>{t("org.type")}</th>
+                <th>{t("org.status")}</th>
+                {showActions ? <th className="text-end">{t("common.actions")}</th> : null}
               </tr>
             </thead>
             <tbody className="table-border-bottom-0">
               {loading && !rows.length ? (
-                <tr><td colSpan={colSpan} className="text-center py-4 text-muted-ls">Loading...</td></tr>
+                <tr><td colSpan={colSpan} className="text-center py-4 text-muted-ls">{t("common.loading")}</td></tr>
               ) : null}
               {!loading && !rows.length ? (
-                <tr><td colSpan={colSpan} className="text-center py-4 text-muted-ls">No organizations</td></tr>
+                <tr><td colSpan={colSpan} className="text-center py-4 text-muted-ls">{t("org.empty")}</td></tr>
               ) : null}
               {rows.map((row, idx) => (
                 <tr key={row.id}>
                   <td>{(page - 1) * LIMIT_PER_PAGE + idx + 1}</td>
                   <td><span className="fw-medium text-heading">{row.name}</span></td>
                   <td>{row.slug}</td>
-                  <td>{typeLabel(row.type)}</td>
+                  <td>{typeLabel(row.type, t)}</td>
                   <td>
                     <span className={`badge ${Number(row.status) === 1 ? "bg-label-success" : "bg-label-warning"} me-1`}>
-                      {statusLabel(row.status)}
+                      {statusLabel(row.status, t)}
                     </span>
                   </td>
                   {showActions ? (
@@ -306,23 +349,31 @@ export default function OrganizationsIndex() {
                           <FiMoreVertical size={18} />
                         </button>
                         <div className="dropdown-menu dropdown-menu-end">
+                          <button type="button" className="dropdown-item" onClick={() => setViewRow(row)}>
+                            <FiEye className="me-1" /> {t("org.view")}
+                          </button>
                           {!isTrashed && canUpdate ? (
                             <button type="button" className="dropdown-item" onClick={() => setFormRow(row)}>
-                              <FiEdit2 className="me-1" /> Edit
+                              <FiEdit2 className="me-1" /> {t("org.edit")}
+                            </button>
+                          ) : null}
+                          {!isTrashed && canChangeStatus ? (
+                            <button type="button" className="dropdown-item" onClick={() => openStatus(row)}>
+                              <FiToggleLeft className="me-1" /> {t("org.changeStatus")}
                             </button>
                           ) : null}
                           {!isTrashed && canDelete ? (
                             <button type="button" className="dropdown-item text-danger" onClick={() => onSoftDelete(row)}>
-                              <FiTrash2 className="me-1" /> Delete
+                              <FiTrash2 className="me-1" /> {t("org.delete")}
                             </button>
                           ) : null}
                           {isTrashed ? (
                             <>
                               <button type="button" className="dropdown-item" onClick={() => onRestore(row)}>
-                                <FiRotateCcw className="me-1" /> Restore
+                                <FiRotateCcw className="me-1" /> {t("org.restore")}
                               </button>
                               <button type="button" className="dropdown-item text-danger" onClick={() => onForceDelete(row)}>
-                                <FiTrash2 className="me-1" /> Delete forever
+                                <FiTrash2 className="me-1" /> {t("org.deleteForever")}
                               </button>
                             </>
                           ) : null}
@@ -355,6 +406,39 @@ export default function OrganizationsIndex() {
             load();
           }}
         />
+      ) : null}
+
+      {viewRow ? <OrganizationViewModal row={viewRow} onClose={() => setViewRow(null)} /> : null}
+
+      {statusRow ? (
+        <Modal
+          as="form"
+          title={t("org.changeStatusTitle")}
+          onClose={() => !statusBusy && setStatusRow(null)}
+          onSubmit={saveStatus}
+          busy={statusBusy}
+          footer={
+            <>
+              <button type="button" className="btn btn-outline-secondary" onClick={() => setStatusRow(null)} disabled={statusBusy}>
+                {t("common.cancel")}
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={statusBusy}>
+                {statusBusy ? t("common.saving") : t("common.save")}
+              </button>
+            </>
+          }
+        >
+          <p className="text-heading fw-medium mb-3">{statusRow.name}</p>
+          <FormField label={t("org.status")} htmlFor="org-change-status">
+            <AsyncSearchSelect
+              inputId="org-change-status"
+              options={statusOptions}
+              value={statusValue}
+              isClearable={false}
+              onChange={(v) => setStatusValue(v)}
+            />
+          </FormField>
+        </Modal>
       ) : null}
     </>
   );

@@ -65,7 +65,7 @@ function OptionItems({ options, active, onSelect, icons }) {
 export default function AdminNavbar({ onOpenMobileMenu, notifications = [] }) {
   const { user, logout } = useAdminAuth();
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [theme, setThemeState] = useState(getTheme);
 
   useEffect(() => watchSystemTheme(), []);
@@ -89,13 +89,13 @@ export default function AdminNavbar({ onOpenMobileMenu, notifications = [] }) {
         <button
           type="button"
           className="nav-icon-btn d-lg-none"
-          aria-label="Open menu"
+          aria-label={t("nav.openMenu")}
           onClick={onOpenMobileMenu}
         >
           <FiMenu />
         </button>
         <span className="navbar-search">
-          <FiSearch /> Search
+          <FiSearch /> {t("nav.search")}
         </span>
       </div>
 
@@ -105,17 +105,22 @@ export default function AdminNavbar({ onOpenMobileMenu, notifications = [] }) {
         </NavDropdown>
 
         <NavDropdown icon={THEME_ICONS[theme]} label="Theme">
-          <OptionItems options={THEME_OPTIONS} active={theme} onSelect={onThemeChange} icons={THEME_ICONS} />
+          <OptionItems
+            options={THEME_OPTIONS.map((o) => ({ ...o, label: t(`theme.${o.key}`) }))}
+            active={theme}
+            onSelect={onThemeChange}
+            icons={THEME_ICONS}
+          />
         </NavDropdown>
 
         <NavDropdown
           icon={FiBell}
-          label="Notifications"
+          label={t("nav.notifications")}
           menuClassName="dropdown-notifications"
           dot={notifications.length > 0}
         >
           <div className="dropdown-menu-header">
-            <h6>Notification</h6>
+            <h6>{t("nav.notification")}</h6>
             {notifications.length ? (
               <span className="badge rounded-pill bg-label-primary">{notifications.length} New</span>
             ) : null}
@@ -130,7 +135,7 @@ export default function AdminNavbar({ onOpenMobileMenu, notifications = [] }) {
           ) : (
             <div className="notification-empty">
               <FiBell />
-              <div>No new notifications</div>
+              <div>{t("nav.noNotifications")}</div>
             </div>
           )}
         </NavDropdown>
@@ -158,7 +163,7 @@ export default function AdminNavbar({ onOpenMobileMenu, notifications = [] }) {
             <li><hr className="dropdown-divider" /></li>
             <li>
               <button type="button" className="dropdown-item d-flex align-items-center gap-2" onClick={onLogout}>
-                <FiLogOut /> Log Out
+                <FiLogOut /> {t("nav.logout")}
               </button>
             </li>
           </ul>
