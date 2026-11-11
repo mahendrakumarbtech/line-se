@@ -1,0 +1,27 @@
+---
+description: Admin UI must follow Sneat Bootstrap vertical-menu style
+alwaysApply: true
+---
+
+# Admin UI — Sneat style
+
+Reference: [Sneat vertical menu template](https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/)
+
+When building or changing **admin** frontend (`frontend/src/components/admin`, `frontend/src/pages/admin`, `frontend/src/styles/admin`):
+
+- Keep **vertical sidebar + sticky rounded navbar + `#f5f5f9` content bg** shell from `AdminLayout`.
+- Primary: `#696cff`. Headings: `#566a7f`. Muted: `#a1acb8`. Cards: white, soft shadow, `0.5rem` radius.
+- Font: **Public Sans**.
+- Prefer Bootstrap 5 + existing `admin.css` utilities (`.card`, `.page-title`, `.menu-link`, `.bg-label-*`, `.table-ls`, `.badge-ls`).
+- Layout content is `container-fluid` (list, add, edit — everywhere). No fixed max-width cards.
+- New admin pages: page title row + content inside `.card` / `.card-body`.
+- List pages: Sneat **basic table** markup directly in the page (`.card` > `.table-responsive.text-nowrap` > `table.table`, `tbody.table-border-bottom-0`, `badge bg-label-*`, row `dropdown` with `hide-arrow` dots). No generic datatable component. Keep server-side filter/pagination, Refresh, Export CSV, row Actions (NotifySphere behavior); pager via `ListPaginationBar`.
+- Sidebar collapse/expand sirf border pe baithe primary-color arrow button se (navbar me hamburger sirf mobile).
+- Topbar (`AdminNavbar`, sab admin pages pe): Language, Light/Dark/System theme, Notifications, Profile dropdowns.
+- Colors hardcode mat karo — `variables.css` ke `--ls-*` vars use karo taaki dark mode chale.
+- Add / Edit alag page pe nahi — list page pe `components/common/Modal` me (`pages/admin/<Module>/FormModal.jsx`), save ke baad list `load()`.
+- List me ID nahi, **Sr No** (`(page - 1) * limit + idx + 1`).
+- Export hamesha server-side: controller me `EXPORT_HEADERS` + `exportList` (list wala hi query builder) → backend `sendExport(res, { headers, data, filename, type })`. Frontend `apiDownload` + `EXPORT_TYPE_CODES` dropdown.
+- Shared frontend helpers (pagination, CSV export, labels, theme, initials) sirf `utils/custom.js` me; pehle wahan dekho, duplicate mat banao.
+- Do **not** invent a different admin theme (no dark sidebar by default, no unrelated purple gradients, no flat grey boxes without Sneat card look).
+- Auth pages stay on `AuthLayout` + `auth.css` (same palette).

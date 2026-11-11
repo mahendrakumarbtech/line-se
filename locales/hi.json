@@ -30,7 +30,6 @@
   "validation.formInvalid": "कृपया आवश्यक फ़ील्ड भरें",
   "roles.SUPER_ADMIN": "सुपर एडमिन",
   "common.error": "कुछ गलत हो गया",
-
   "errors.AUTH_TOKEN_MISSING": "आपका अनुरोध अधिकृत नहीं है। कृपया मान्य टोकन दें।",
   "errors.AUTH_USER_NOT_FOUND": "अमान्य उपयोगकर्ता",
   "errors.AUTH_NOT_PLATFORM_ROLE": "आप इस प्लेटफ़ॉर्म तक पहुँचने के अधिकृत नहीं हैं",
@@ -50,7 +49,6 @@
   "errors.AUTH_PASSWORD_MISMATCH": "पासवर्ड मेल नहीं खाते",
   "errors.AUTH_CONFIRM_PASSWORD_REQUIRED": "पासवर्ड की पुष्टि आवश्यक है",
   "errors.AUTH_MAIL_SEND_FAILED": "ईमेल नहीं भेजा जा सका। कृपया बाद में पुनः प्रयास करें",
-
   "errors.ORG_NOT_FOUND": "संगठन नहीं मिला",
   "errors.ORG_SLUG_EXISTS": "संगठन स्लग पहले से मौजूद है",
   "errors.ORG_CREATE_FAILED": "संगठन बनाने में विफल",
@@ -66,7 +64,7 @@
   "errors.ORG_STATUS_REQUIRED": "स्थिति आवश्यक है",
   "errors.ORG_BULK_DELETE_FAILED": "संगठन बल्क डिलीट में विफल",
   "errors.ORG_BULK_RESTORE_FAILED": "संगठन बल्क रिस्टोर में विफल",
-
+  "errors.ORG_EXPORT_FAILED": "संगठन एक्सपोर्ट करने में विफल",
   "errors.USER_NOT_FOUND": "उपयोगकर्ता नहीं मिला",
   "errors.USER_EMAIL_EXISTS": "ईमेल पहले से मौजूद है",
   "errors.USER_PHONE_EXISTS": "फ़ोन पहले से मौजूद है",
@@ -87,7 +85,6 @@
   "errors.USER_BULK_DELETE_FAILED": "उपयोगकर्ता बल्क डिलीट में विफल",
   "errors.USER_BULK_RESTORE_FAILED": "उपयोगकर्ता बल्क रिस्टोर में विफल",
   "errors.USER_SELF_ACTION_DENIED": "आप अपने खाते पर यह कार्य नहीं कर सकते",
-
   "success.AUTH_LOGIN_SUCCESS": "लॉगिन सफल",
   "success.AUTH_SUCCESS": "प्रमाणीकरण सफल",
   "success.AUTH_FORGOT_SENT": "पासवर्ड रीसेट लिंक आपके ईमेल पर भेज दिया गया है",

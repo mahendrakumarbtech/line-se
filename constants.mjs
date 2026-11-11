@@ -54,6 +54,7 @@ const MESSAGE_CODES = Object.freeze([
   { key: "ORG_STATUS_REQUIRED", value: "300013" },
   { key: "ORG_BULK_DELETE_FAILED", value: "300014" },
   { key: "ORG_BULK_RESTORE_FAILED", value: "300015" },
+  { key: "ORG_EXPORT_FAILED", value: "300016" },
   { key: "USER_NOT_FOUND", value: "200001" },
   { key: "USER_EMAIL_EXISTS", value: "200002" },
   { key: "USER_PHONE_EXISTS", value: "200003" },
@@ -213,6 +214,22 @@ const ORGANIZATION_TYPE_CODES = Object.freeze([
 
 const getOrganizationType = (key) => ORGANIZATION_TYPE_CODES.find((item) => item.key === key);
 
+/** Label for a value from an option list: findLabel(STATUS_OPTIONS, 1, { valueKey: "id", labelKey: "text" }) */
+const findLabel = (options, value, { valueKey = "value", labelKey = "label" } = {}) => {
+  const item = (options || []).find((o) => String(o[valueKey]) === String(value));
+  return item ? item[labelKey] : value;
+};
+
+const EXPORT_TYPE_CODES = Object.freeze([
+  { key: "CSV", value: "csv", label: "CSV", mime: "text/csv; charset=utf-8" },
+  { key: "EXCEL", value: "xlsx", label: "Excel", mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+  { key: "PDF", value: "pdf", label: "PDF", mime: "application/pdf" },
+]);
+
+const getExportType = (key) => EXPORT_TYPE_CODES.find((item) => item.key === key);
+
+const EXPORT_MAX_ROWS = 50000;
+
 const APP_LANGUAGES = [
   { key: "en", label: "English" },
   { key: "hi", label: "हिन्दी" },
@@ -235,6 +252,10 @@ export {
   STATUS_OPTIONS,
   ORGANIZATION_TYPE_CODES,
   getOrganizationType,
+  findLabel,
+  EXPORT_TYPE_CODES,
+  getExportType,
+  EXPORT_MAX_ROWS,
   APP_LANGUAGES,
 };
 

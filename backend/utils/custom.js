@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import models from "../models/index.js";
 import { compare, hash } from "bcryptjs";
+import ExcelJS from "exceljs";
+import PDFDocument from "pdfkit";
 import {
 	ROLE_TYPE_CODES,
 	getRoleType,
@@ -16,7 +18,12 @@ import {
 	canAccessAny,
 	canAccessAll,
 	LIMIT_PER_PAGE,
-	APP_LANGUAGES
+	APP_LANGUAGES,
+	STATUS_OPTIONS,
+	ORGANIZATION_TYPE_CODES,
+	findLabel,
+	getExportType,
+	EXPORT_MAX_ROWS,
 } from "../../constants.mjs";
 
 const requestLang = new AsyncLocalStorage();
@@ -346,8 +353,97 @@ async function sendMail({ to, subject, html, text }) {
 	return { messageId: info.messageId, previewUrl };
 }
 
+// ---------- export (csv / excel / pdf) ----------
+const csvEscape = (v) => {
+	const s = String(v ?? "");
+	return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
+/** Bounded page / limit from request body. */
+const getPagination = ({ page, limit } = {}, maxLimit = 100) => {
+	const safePage = Math.max(1, parseInt(page, 10) || 1);
+	const safeLimit = Math.min(maxLimit, Math.max(1, parseInt(limit, 10) || LIMIT_PER_PAGE));
+	return { page: safePage, limit: safeLimit, offset: (safePage - 1) * safeLimit };
+};
+
+function writePdf(res, title, labels, rows) {
+	const doc = new PDFDocument({ size: "A4", layout: labels.length > 5 ? "landscape" : "portrait", margin: 30 });
+	doc.pipe(res);
+
+	const left = doc.page.margins.left;
+	const width = doc.page.width - left - doc.page.margins.right;
+	const colWidth = width / labels.length;
+	const rowHeight = 20;
+
+	const drawRow = (cells, isHeader = false) => {
+		if (doc.y + rowHeight > doc.page.height - doc.page.margins.bottom) {
+			doc.addPage();
+			drawRow(labels, true);
+		}
+		const y = doc.y;
+		if (isHeader) doc.rect(left, y, width, rowHeight).fill("#f0f0ff");
+		doc.fillColor(isHeader ? "#566a7f" : "#333333").font(isHeader ? "Helvetica-Bold" : "Helvetica").fontSize(9);
+		cells.forEach((cell, i) => {
+			doc.text(String(cell), left + i * colWidth + 4, y + 6, {
+				width: colWidth - 8,
+				lineBreak: false,
+				ellipsis: true,
+			});
+		});
+		doc.moveTo(left, y + rowHeight).lineTo(left + width, y + rowHeight).strokeColor("#e7e7ff").stroke();
+		doc.x = left;
+		doc.y = y + rowHeight;
+	};
+
+	doc.font("Helvetica-Bold").fontSize(14).fillColor("#566a7f").text(title);
+	doc.moveDown(0.5);
+	drawRow(labels, true);
+	rows.forEach((r) => drawRow(r));
+	doc.end();
+}
+
+/**
+ * One exporter for every list.
+ * headers: [{ key, label, value?(row, index) }]  — value() for computed cells (sr no, labels, dates)
+ * type: EXPORT_TYPE_CODES key (CSV | EXCEL | PDF), default CSV
+ */
+async function sendExport(res, { headers, data, filename = "export", type }) {
+	const format = getExportType(type) || getExportType("CSV");
+	const labels = headers.map((h) => h.label || h.key);
+	const rows = (data || []).map((row, i) => headers.map((h) => (h.value ? h.value(row, i) : row[h.key]) ?? ""));
+	const name = String(filename).replace(/[^\w.-]+/g, "_");
+
+	res.setHeader("Content-Type", format.mime);
+	res.setHeader("Content-Disposition", `attachment; filename="${name}.${format.value}"`);
+	res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+
+	if (format.key === "EXCEL") {
+		const workbook = new ExcelJS.Workbook();
+		const sheet = workbook.addWorksheet(name.slice(0, 31));
+		sheet.columns = labels.map((header) => ({ header, width: Math.max(14, header.length + 4) }));
+		sheet.getRow(1).font = { bold: true };
+		sheet.addRows(rows);
+		await workbook.xlsx.write(res);
+		return res.end();
+	}
+
+	if (format.key === "PDF") return writePdf(res, filename, labels, rows);
+
+	const csv = [labels, ...rows].map((r) => r.map(csvEscape).join(",")).join("\r\n");
+	return res.send(`\uFEFF${csv}`);
+}
+
+const formatDateTime = (value) => (value ? new Date(value).toLocaleString("en-IN") : "");
+
 export {
 	// constants re-export
+	STATUS_OPTIONS,
+	ORGANIZATION_TYPE_CODES,
+	findLabel,
+	EXPORT_MAX_ROWS,
+	getPagination,
+	sendExport,
+	formatDateTime,
 	ROLE_TYPE_CODES,
 	getRoleType,
 	MESSAGE_CODES,

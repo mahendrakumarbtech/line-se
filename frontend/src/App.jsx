@@ -8,8 +8,6 @@ import ResetPassword from "./pages/admin/auth/ResetPassword";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import OrganizationsIndex from "./pages/admin/Organization/Index";
-import OrganizationForm from "./pages/admin/Organization/Form";
-
 
 
 export default function App() {
@@ -30,8 +28,6 @@ export default function App() {
                 <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="organizations" element={<OrganizationsIndex />} />
-                  <Route path="organizations/add" element={<OrganizationForm />} />
-                  <Route path="organizations/edit/:id" element={<OrganizationForm />} />
                 </Route>
                 <Route path="*" element={<Navigate to="login" replace />} />
               </Routes>

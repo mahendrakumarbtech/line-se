@@ -1,12 +1,43 @@
 :root {
   --bs-primary: #696cff;
+  --bs-primary-rgb: 105, 108, 255;
   --ls-primary: #696cff;
   --ls-primary-hover: #5f61e6;
+  --ls-primary-soft: rgba(105, 108, 255, 0.16);
   --ls-body-bg: #f5f5f9;
+  --ls-body-color: #697a8d;
+  --ls-card-bg: #ffffff;
   --ls-card-shadow: 0 0.25rem 1.125rem rgba(75, 70, 92, 0.1);
   --ls-heading: #566a7f;
   --ls-muted: #a1acb8;
   --ls-admin-sidebar: #ffffff;
   --ls-admin-accent: #696cff;
   --ls-admin-bg: #f5f5f9;
+  --ls-navbar-bg: rgba(255, 255, 255, 0.95);
+  --ls-menu-width: 16.25rem;
+  --ls-border: #e7e7ff;
+  --ls-table-border: #f0f0f5;
+  --ls-input-border: #d9dee3;
+  --ls-hover-bg: rgba(67, 89, 113, 0.06);
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #2b2c40;
+  --bs-body-color: #a3a4cc;
+  --bs-border-color: #444564;
+  --bs-secondary-color: #7071a4;
+  --bs-tertiary-bg: #232333;
+  --ls-body-bg: #232333;
+  --ls-body-color: #a3a4cc;
+  --ls-card-bg: #2b2c40;
+  --ls-card-shadow: 0 0.25rem 1.125rem rgba(0, 0, 0, 0.25);
+  --ls-heading: #cbcbe2;
+  --ls-muted: #7071a4;
+  --ls-admin-sidebar: #2b2c40;
+  --ls-admin-bg: #232333;
+  --ls-navbar-bg: rgba(43, 44, 64, 0.95);
+  --ls-border: #444564;
+  --ls-table-border: #444564;
+  --ls-input-border: #444564;
+  --ls-hover-bg: rgba(255, 255, 255, 0.06);
 }

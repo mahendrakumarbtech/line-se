@@ -45,3 +45,48 @@
 .ls-password .form-control.is-invalid {
   padding-right: 2.5rem;
 }
+/* react-select (AsyncSearchSelect) — Sneat look, theme aware */
+.ls-select__control.ls-select__control {
+  min-height: calc(1.5em + 0.75rem + 2px);
+  background: var(--ls-card-bg);
+  border-color: var(--ls-input-border);
+  border-radius: 0.375rem;
+  box-shadow: none;
+}
+.ls-select__control.ls-select__control--is-focused {
+  border-color: var(--ls-primary);
+  box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.15);
+}
+.ls-select__single-value.ls-select__single-value,
+.ls-select__input-container.ls-select__input-container {
+  color: var(--ls-body-color);
+}
+.ls-select__placeholder.ls-select__placeholder {
+  color: var(--ls-muted);
+}
+.ls-select__menu.ls-select__menu {
+  background: var(--ls-card-bg);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 1rem rgba(75, 70, 92, 0.16);
+  overflow: hidden;
+}
+.ls-select__menu-portal.ls-select__menu-portal {
+  z-index: 1060;
+}
+.ls-select__option.ls-select__option {
+  color: var(--ls-body-color);
+  background: transparent;
+}
+.ls-select__option.ls-select__option--is-focused {
+  background: var(--ls-hover-bg);
+}
+.ls-select__option.ls-select__option--is-selected {
+  background: var(--ls-primary-soft);
+  color: var(--ls-primary);
+}
+.ls-select__indicator-separator.ls-select__indicator-separator {
+  background: var(--ls-input-border);
+}
+.is-invalid .ls-select__control.ls-select__control {
+  border-color: var(--bs-form-invalid-border-color);
+}

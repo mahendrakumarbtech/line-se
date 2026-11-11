@@ -5,6 +5,8 @@ import {
   ORGANIZATION_TYPE_CODES,
   APP_LANGUAGES,
   getMessageLabel,
+  findLabel,
+  EXPORT_TYPE_CODES,
 } from "../../../constants.mjs";
 
 const STORAGE_PREFIX = "linese_";
@@ -116,7 +118,43 @@ export const STORAGE_KEYS = {
   ADMIN_TOKEN: `${STORAGE_PREFIX}admin_token`,
   ADMIN_USER: `${STORAGE_PREFIX}admin_user`,
   LANG: `${STORAGE_PREFIX}lang`,
+  THEME: `${STORAGE_PREFIX}theme`,
+  MENU_COLLAPSED: `${STORAGE_PREFIX}menu_collapsed`,
 };
+
+// ---------- theme (light / dark / system) ----------
+export const THEME_OPTIONS = [
+  { key: "light", label: "Light" },
+  { key: "dark", label: "Dark" },
+  { key: "system", label: "System" },
+];
+
+const systemDarkQuery = () => window.matchMedia("(prefers-color-scheme: dark)");
+
+export function getTheme() {
+  const saved = getLocal(STORAGE_KEYS.THEME);
+  return THEME_OPTIONS.some((t) => t.key === saved) ? saved : "light";
+}
+
+export function applyTheme(theme = getTheme()) {
+  const resolved = theme === "system" ? (systemDarkQuery().matches ? "dark" : "light") : theme;
+  document.documentElement.setAttribute("data-bs-theme", resolved);
+}
+
+export function setTheme(theme) {
+  setLocal(STORAGE_KEYS.THEME, theme);
+  applyTheme(theme);
+}
+
+/** Re-apply when OS theme changes while "system" selected. Returns unsubscribe. */
+export function watchSystemTheme() {
+  const query = systemDarkQuery();
+  const onChange = () => {
+    if (getTheme() === "system") applyTheme("system");
+  };
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
 
 // --- date helpers (pickers) ---
 export function toLocalIsoDate(d = new Date()) {
@@ -170,7 +208,37 @@ export function applyServerErrors(resOrErrors, setErrors) {
   setErrors((prev) => ({ ...prev, ...fieldErrors }));
 }
 
-// baad me yahi se constants re-export bhi kar sakte ho:
+export function getInitials(name, fallback = "A") {
+  return String(name || fallback)
+    .trim()
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+// ---------- list pagination ----------
+export function getTotalPages(totalRows, pageSize) {
+  return Math.max(1, Math.ceil(Number(totalRows || 0) / (pageSize || 1)));
+}
+
+/** Page number buttons: 1 … around current … last */
+export function getPageItems(totalPages, current) {
+  const pages = Math.max(1, Number(totalPages) || 1);
+  const cur = Math.min(Math.max(1, Number(current) || 1), pages);
+  if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1);
+
+  const items = [1];
+  const start = Math.max(2, cur - 1);
+  const end = Math.min(pages - 1, cur + 1);
+  if (start > 2) items.push("…");
+  for (let p = start; p <= end; p += 1) items.push(p);
+  if (end < pages - 1) items.push("…");
+  items.push(pages);
+  return items;
+}
+
 export function slugify(value) {
   return String(value || "")
     .trim()
@@ -187,4 +255,6 @@ export {
   ORGANIZATION_TYPE_CODES,
   APP_LANGUAGES,
   getMessageLabel,
+  findLabel,
+  EXPORT_TYPE_CODES,
 };

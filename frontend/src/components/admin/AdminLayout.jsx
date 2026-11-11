@@ -1,47 +1,50 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 import { useAdminAuth } from "../../context/AdminAuthContext";
+import { getLocal, setLocal, STORAGE_KEYS } from "../../utils/custom";
+import AdminNavbar from "./AdminNavbar";
+import AdminSidebar from "./AdminSidebar";
 import "../../styles/admin/admin.css";
 
 export default function AdminLayout() {
-  const { user, logout } = useAdminAuth();
+  const { user } = useAdminAuth();
+  const [collapsed, setCollapsed] = useState(() => getLocal(STORAGE_KEYS.MENU_COLLAPSED) === "1");
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const linkStyle = ({ isActive }) => ({
-    display: "block",
-    padding: "8px 12px",
-    textDecoration: "none",
-    color: isActive ? "#fff" : "#333",
-    background: isActive ? "#333" : "transparent",
-    borderRadius: 4,
-    marginBottom: 4,
-  });
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 992) setMobileOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const toggleCollapsed = () => {
+    const next = !collapsed;
+    setLocal(STORAGE_KEYS.MENU_COLLAPSED, next ? "1" : "0");
+    setCollapsed(next);
+  };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside style={{ width: 220, padding: 16, borderRight: "1px solid #ddd" }}>
-        <strong>LineSe Admin</strong>
-        <nav style={{ marginTop: 16 }}>
-          <NavLink to="/admin/dashboard" style={linkStyle}>Dashboard</NavLink>
-          <NavLink to="/admin/organizations" style={linkStyle}>Organizations</NavLink>
-        </nav>
-      </aside>
+    <div className="layout-wrapper">
+      {mobileOpen ? <div className="layout-overlay" onClick={() => setMobileOpen(false)} /> : null}
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <header
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            gap: 12,
-            padding: "12px 20px",
-            borderBottom: "1px solid #ddd",
-          }}
-        >
-          <span>{user?.name}</span>
-          <button type="button" onClick={logout}>Logout</button>
-        </header>
-        <main style={{ padding: 20 }}>
-          <Outlet />
-        </main>
+      <AdminSidebar
+        user={user}
+        collapsed={collapsed}
+        mobileOpen={mobileOpen}
+        onToggleCollapsed={toggleCollapsed}
+        onCloseMobile={() => setMobileOpen(false)}
+      />
+
+      <div className="layout-page">
+        <AdminNavbar onOpenMobileMenu={() => setMobileOpen(true)} />
+
+        <div className="content-wrapper">
+          <div className="container-fluid flex-grow-1 container-p-y">
+            <Outlet />
+          </div>
+        </div>
       </div>
     </div>
   );

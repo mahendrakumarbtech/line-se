@@ -4,9 +4,10 @@ import AsyncSelect from "react-select/async";
 import { useAsyncSelect } from "../../hooks/useAsyncSelect";
 import { fetchAjaxListOptions } from "../../services/ajaxList";
 
+/** Accepts { value, label } | { id, text } | { key, label } (constants lists). */
 function toOptions(options = []) {
   return options.map((o) =>
-    o.value != null ? o : { value: o.id, label: o.text, raw: o }
+    o.value != null ? o : { value: o.id ?? o.key, label: o.text ?? o.label, raw: o }
   );
 }
 

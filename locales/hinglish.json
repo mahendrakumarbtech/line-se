@@ -30,7 +30,6 @@
   "validation.formInvalid": "Please required fields fill karo",
   "roles.SUPER_ADMIN": "Super Admin",
   "common.error": "Something went wrong",
-
   "errors.AUTH_TOKEN_MISSING": "Request authorized nahi hai. Valid token do.",
   "errors.AUTH_USER_NOT_FOUND": "Invalid user",
   "errors.AUTH_NOT_PLATFORM_ROLE": "Aap is platform ko access karne ke liye authorized nahi ho",
@@ -50,7 +49,6 @@
   "errors.AUTH_PASSWORD_MISMATCH": "Passwords match nahi karte",
   "errors.AUTH_CONFIRM_PASSWORD_REQUIRED": "Confirm password required hai",
   "errors.AUTH_MAIL_SEND_FAILED": "Email send nahi ho paya. Baad me try karo",
-
   "errors.ORG_NOT_FOUND": "Organization nahi mili",
   "errors.ORG_SLUG_EXISTS": "Organization slug pehle se exist karta hai",
   "errors.ORG_CREATE_FAILED": "Organization create fail ho gaya",
@@ -66,7 +64,7 @@
   "errors.ORG_STATUS_REQUIRED": "Status required hai",
   "errors.ORG_BULK_DELETE_FAILED": "Organizations bulk delete fail ho gaya",
   "errors.ORG_BULK_RESTORE_FAILED": "Organizations bulk restore fail ho gaya",
-
+  "errors.ORG_EXPORT_FAILED": "Organizations export fail ho gaya",
   "errors.USER_NOT_FOUND": "User nahi mila",
   "errors.USER_EMAIL_EXISTS": "Email pehle se exist karta hai",
   "errors.USER_PHONE_EXISTS": "Phone pehle se exist karta hai",
@@ -87,7 +85,6 @@
   "errors.USER_BULK_DELETE_FAILED": "Users bulk delete fail ho gaya",
   "errors.USER_BULK_RESTORE_FAILED": "Users bulk restore fail ho gaya",
   "errors.USER_SELF_ACTION_DENIED": "Apne account pe ye action nahi kar sakte",
-
   "success.AUTH_LOGIN_SUCCESS": "Login successful",
   "success.AUTH_SUCCESS": "Authentication successful",
   "success.AUTH_FORGOT_SENT": "Password reset link aapke email pe bhej diya gaya hai",

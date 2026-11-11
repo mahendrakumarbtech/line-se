@@ -10,7 +10,9 @@ import './index.css'
 import "./styles/common/variables.css";
 import "./styles/common/style.css";
 import App from "./App.jsx";
+import { applyTheme } from "./utils/custom";
 
+applyTheme();
 
 
 createRoot(document.getElementById('root')).render(

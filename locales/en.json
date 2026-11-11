@@ -30,7 +30,6 @@
   "validation.formInvalid": "Please fill the required fields",
   "roles.SUPER_ADMIN": "Super Admin",
   "common.error": "Something went wrong",
-
   "errors.AUTH_TOKEN_MISSING": "Your request is not authorized. Please provide a valid token.",
   "errors.AUTH_USER_NOT_FOUND": "Invalid user",
   "errors.AUTH_NOT_PLATFORM_ROLE": "You are not authorized to access this platform",
@@ -50,7 +49,6 @@
   "errors.AUTH_PASSWORD_MISMATCH": "Passwords do not match",
   "errors.AUTH_CONFIRM_PASSWORD_REQUIRED": "Confirm password is required",
   "errors.AUTH_MAIL_SEND_FAILED": "Could not send email. Please try again later",
-
   "errors.ORG_NOT_FOUND": "Organization not found",
   "errors.ORG_SLUG_EXISTS": "Organization slug already exists",
   "errors.ORG_CREATE_FAILED": "Failed to create organization",
@@ -66,7 +64,7 @@
   "errors.ORG_STATUS_REQUIRED": "Status is required",
   "errors.ORG_BULK_DELETE_FAILED": "Failed to bulk delete organizations",
   "errors.ORG_BULK_RESTORE_FAILED": "Failed to bulk restore organizations",
-
+  "errors.ORG_EXPORT_FAILED": "Failed to export organizations",
   "errors.USER_NOT_FOUND": "User not found",
   "errors.USER_EMAIL_EXISTS": "Email already exists",
   "errors.USER_PHONE_EXISTS": "Phone already exists",
@@ -87,7 +85,6 @@
   "errors.USER_BULK_DELETE_FAILED": "Failed to bulk delete users",
   "errors.USER_BULK_RESTORE_FAILED": "Failed to bulk restore users",
   "errors.USER_SELF_ACTION_DENIED": "You cannot perform this action on your own account",
-
   "success.AUTH_LOGIN_SUCCESS": "Login successful",
   "success.AUTH_SUCCESS": "Authentication successful",
   "success.AUTH_FORGOT_SENT": "Password reset link has been sent to your email",

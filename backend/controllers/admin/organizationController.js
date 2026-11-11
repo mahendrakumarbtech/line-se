@@ -1,38 +1,60 @@
 import { Op } from "sequelize";
-import { errorResponse, successResponse, getMessageLabel, LIMIT_PER_PAGE, canAccess } from "../../utils/custom.js";
+import {
+  errorResponse,
+  successResponse,
+  getMessageLabel,
+  canAccess,
+  getPagination,
+  sendExport,
+  findLabel,
+  formatDateTime,
+  STATUS_OPTIONS,
+  ORGANIZATION_TYPE_CODES,
+  EXPORT_MAX_ROWS,
+} from "../../utils/custom.js";
 import models from "../../models/index.js";
 
+const EXPORT_HEADERS = [
+  { key: "sr_no", label: "Sr No", value: (_row, i) => i + 1 },
+  { key: "name", label: "Name" },
+  { key: "slug", label: "Slug" },
+  { key: "type", label: "Type", value: (row) => findLabel(ORGANIZATION_TYPE_CODES, row.type) },
+  { key: "status", label: "Status", value: (row) => findLabel(STATUS_OPTIONS, row.status, { valueKey: "id", labelKey: "text" }) },
+  { key: "created_at", label: "Created At", value: (row) => formatDateTime(row.createdAt) },
+];
+
+/** Same filter for list + export. Returns null when trashed list not allowed. */
+const buildListQuery = (req, filter = {}) => {
+  if (filter.trashed && !canAccess(req.authUser, "organization.manage-delete")) return null;
+
+  const where = {};
+  if (filter.status !== undefined && filter.status !== null && filter.status !== "") {
+    where.status = Number(filter.status);
+  }
+  const search = String(filter.search || "").trim();
+  if (search) {
+    where[Op.or] = [
+      { name: { [Op.like]: `%${search}%` } },
+      { slug: { [Op.like]: `%${search}%` } },
+    ];
+  }
+
+  const query = { where, order: [["created_at", "DESC"]] };
+  if (filter.trashed) {
+    query.paranoid = false;
+    where.deleted_at = { [Op.ne]: null };
+  }
+  return query;
+};
+
 async function index(req, res) {
-  const { filter = {}, page = 1, limit = LIMIT_PER_PAGE } = req.body;
-  const offset = (page - 1) * limit;
+  const { filter = {} } = req.body;
+  const { page, limit, offset } = getPagination(req.body);
+  const query = buildListQuery(req, filter);
+  if (!query) return res.status(403).json(errorResponse("AUTH_PERMISSION_DENIED"));
+
   try {
-    const where = {};
-    if (filter.status !== undefined && filter.status !== "") {
-      where.status = Number(filter.status);
-    }
-    if (filter.search?.trim()) {
-      where[Op.or] = [
-        { name: { [Op.like]: `%${filter.search.trim()}%` } },
-        { slug: { [Op.like]: `%${filter.search.trim()}%` } },
-      ];
-    }
-
-    const query = {
-      where,
-      order: [["created_at", "DESC"]],
-      limit,
-      offset,
-    };
-
-    if (filter.trashed) {
-      if (!canAccess(req.authUser, "organization.manage-delete")) {
-        return res.status(403).json(errorResponse("AUTH_PERMISSION_DENIED"));
-      }
-      query.paranoid = false;
-      where.deleted_at = { [Op.ne]: null };
-    }
-
-    const { count, rows } = await models.Organization.findAndCountAll(query);
+    const { count, rows } = await models.Organization.findAndCountAll({ ...query, limit, offset });
     return res.status(200).json(successResponse({
       organizations: rows,
       total: count,
@@ -41,6 +63,25 @@ async function index(req, res) {
     }, "ORG_LISTED"));
   } catch (error) {
     return res.status(500).json(errorResponse("ORG_LIST_FAILED"));
+  }
+}
+
+async function exportList(req, res) {
+  const { filter = {}, type } = req.body;
+  const query = buildListQuery(req, filter);
+  if (!query) return res.status(403).json(errorResponse("AUTH_PERMISSION_DENIED"));
+
+  try {
+    const rows = await models.Organization.findAll({ ...query, limit: EXPORT_MAX_ROWS });
+    return await sendExport(res, {
+      headers: EXPORT_HEADERS,
+      data: rows,
+      filename: `organizations-${filter.trashed ? "deleted" : "active"}`,
+      type,
+    });
+  } catch (error) {
+    if (res.headersSent) return res.end();
+    return res.status(500).json(errorResponse("ORG_EXPORT_FAILED"));
   }
 }
 
@@ -238,4 +279,4 @@ async function changeStatus(req, res) {
   }
 }
 
-export { index, view, add, edit, softDelete, bulkSoftDelete, restore, bulkRestore, forceDelete, bulkForceDelete, changeStatus };
+export { index, exportList, view, add, edit, softDelete, bulkSoftDelete, restore, bulkRestore, forceDelete, bulkForceDelete, changeStatus };
