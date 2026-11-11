@@ -44,6 +44,16 @@ async function index(req, res) {
   }
 }
 
+async function view(req, res) {
+  const { id } = req.body;
+  if (!id) return res.status(400).json(errorResponse("ORG_ID_REQUIRED"));
+
+  const organization = await models.Organization.findByPk(id);
+  if (!organization) return res.status(404).json(errorResponse("ORG_NOT_FOUND"));
+
+  return res.status(200).json(successResponse(organization));
+}
+
 async function add(req, res) {
   const { name, slug, type, status } = req.body;
   const errors = {};
@@ -60,13 +70,16 @@ async function add(req, res) {
   }
 
   if (Object.keys(errors).length) {
-    return res.status(400).json(
-      errorResponse("ORG_VALIDATION_FAILED", { errors })
-    );
+    return res.status(400).json(errorResponse("FORM_INVALID", { errors }));
   }
 
   try {
-    const organization = await models.Organization.create({ name: name.trim(), slug: slug.trim(), type, status });
+    const organization = await models.Organization.create({
+      name: name.trim(),
+      slug: slug.trim(),
+      type: Number(type),
+      status: status === undefined || status === null || status === "" ? 1 : Number(status),
+    });
     return res.status(200).json(successResponse(organization, "ORG_CREATED"));
   } catch (error) {
     return res.status(500).json(errorResponse("ORG_CREATE_FAILED"));
@@ -75,12 +88,16 @@ async function add(req, res) {
 
 async function edit(req, res) {
   const { id, name, slug, type, status } = req.body;
-  if (!id) return res.status(400).json(errorResponse("ORG_ID_REQUIRED"));
-
-  const organization = await models.Organization.findByPk(id);
-  if (!organization) return res.status(404).json(errorResponse("ORG_NOT_FOUND"));
-
   const errors = {};
+
+  if (!id) errors.id = getMessageLabel("ORG_ID_REQUIRED");
+
+  let organization = null;
+  if (id && !errors.id) {
+    organization = await models.Organization.findByPk(id);
+    if (!organization) errors.id = getMessageLabel("ORG_NOT_FOUND");
+  }
+
   if (!name?.trim()) errors.name = getMessageLabel("ORG_NAME_REQUIRED");
   if (!slug?.trim()) errors.slug = getMessageLabel("ORG_SLUG_REQUIRED");
   if (type === undefined || type === null || type === "") {
@@ -93,15 +110,17 @@ async function edit(req, res) {
     if (exists) errors.slug = getMessageLabel("ORG_SLUG_EXISTS");
   }
   if (Object.keys(errors).length) {
-    return res.status(400).json(errorResponse("ORG_VALIDATION_FAILED", { errors }));
+    return res.status(400).json(errorResponse("FORM_INVALID", { errors }));
   }
 
   try {
     await organization.update({
       name: name.trim(),
       slug: slug.trim(),
-      type,
-      ...(status !== undefined ? { status } : {}),
+      type: Number(type),
+      ...(status !== undefined && status !== null && status !== ""
+        ? { status: Number(status) }
+        : {}),
     });
     return res.status(200).json(successResponse(organization, "ORG_UPDATED"));
   } catch {
@@ -219,4 +238,4 @@ async function changeStatus(req, res) {
   }
 }
 
-export { index, add, edit, softDelete, bulkSoftDelete, restore, bulkRestore, forceDelete, bulkForceDelete, changeStatus };
+export { index, view, add, edit, softDelete, bulkSoftDelete, restore, bulkRestore, forceDelete, bulkForceDelete, changeStatus };

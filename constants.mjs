@@ -204,6 +204,15 @@ const STATUS_OPTIONS = [
   { id: 0, text: "Inactive" },
 ];
 
+const ORGANIZATION_TYPE_CODES = Object.freeze([
+  { key: "BUSINESS", value: 1, label: "Business" },
+  { key: "AGENCY", value: 2, label: "Agency" },
+  { key: "FRANCHISE", value: 3, label: "Franchise" },
+  { key: "OTHER", value: 4, label: "Other" },
+]);
+
+const getOrganizationType = (key) => ORGANIZATION_TYPE_CODES.find((item) => item.key === key);
+
 const APP_LANGUAGES = [
   { key: "en", label: "English" },
   { key: "hi", label: "हिन्दी" },
@@ -224,6 +233,8 @@ export {
   canAccessAll,
   LIMIT_PER_PAGE,
   STATUS_OPTIONS,
+  ORGANIZATION_TYPE_CODES,
+  getOrganizationType,
   APP_LANGUAGES,
 };
 

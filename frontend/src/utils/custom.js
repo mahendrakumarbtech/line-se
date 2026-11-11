@@ -2,6 +2,7 @@ import {
   canAccess,
   LIMIT_PER_PAGE,
   STATUS_OPTIONS,
+  ORGANIZATION_TYPE_CODES,
   APP_LANGUAGES,
   getMessageLabel,
 } from "../../../constants.mjs";
@@ -170,10 +171,20 @@ export function applyServerErrors(resOrErrors, setErrors) {
 }
 
 // baad me yahi se constants re-export bhi kar sakte ho:
+export function slugify(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 export {
   canAccess,
   LIMIT_PER_PAGE,
   STATUS_OPTIONS,
+  ORGANIZATION_TYPE_CODES,
   APP_LANGUAGES,
   getMessageLabel,
 };

@@ -1,10 +1,21 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { apiPost } from "../../../services/api";
 import { useAdminAuth } from "../../../context/AdminAuthContext";
-import { canAccess, LIMIT_PER_PAGE } from "../../../utils/custom";
+import { canAccess, LIMIT_PER_PAGE, ORGANIZATION_TYPE_CODES, STATUS_OPTIONS } from "../../../utils/custom";
+
+function typeLabel(value) {
+  return ORGANIZATION_TYPE_CODES.find((t) => Number(t.value) === Number(value))?.label || value;
+}
+
+function statusLabel(value) {
+  return STATUS_OPTIONS.find((s) => Number(s.id) === Number(value))?.text || value;
+}
 
 export default function OrganizationsIndex() {
   const { token, user } = useAdminAuth();
+  const canCreate = canAccess(user, "organization.create");
+  const canUpdate = canAccess(user, "organization.update");
   const canManageDelete = canAccess(user, "organization.manage-delete");
 
   const [tab, setTab] = useState("active"); // active | trashed
@@ -51,7 +62,14 @@ export default function OrganizationsIndex() {
 
   return (
     <div>
-      <h1>Organizations</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1 className="h4 mb-0">Organizations</h1>
+        {canCreate && tab === "active" ? (
+          <Link to="/admin/organizations/add" className="btn btn-primary btn-sm">
+            Add Organization
+          </Link>
+        ) : null}
+      </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
         <button
@@ -77,8 +95,10 @@ export default function OrganizationsIndex() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search name / slug"
+          className="form-control"
+          style={{ maxWidth: 280 }}
         />
-        <button type="submit">Search</button>
+        <button type="submit" className="btn btn-outline-primary btn-sm">Search</button>
       </form>
 
       {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
@@ -92,19 +112,25 @@ export default function OrganizationsIndex() {
             <th>Slug</th>
             <th>Type</th>
             <th>Status</th>
+            {tab === "active" && canUpdate ? <th>Actions</th> : null}
           </tr>
         </thead>
         <tbody>
           {rows.length === 0 && !loading ? (
-            <tr><td colSpan={5}>No organizations</td></tr>
+            <tr><td colSpan={6}>No organizations</td></tr>
           ) : (
             rows.map((row) => (
               <tr key={row.id} style={{ borderBottom: "1px solid #eee" }}>
                 <td>{row.id}</td>
                 <td>{row.name}</td>
                 <td>{row.slug}</td>
-                <td>{row.type}</td>
-                <td>{row.status}</td>
+                <td>{typeLabel(row.type)}</td>
+                <td>{statusLabel(row.status)}</td>
+                {tab === "active" && canUpdate ? (
+                  <td>
+                    <Link to={`/admin/organizations/edit/${row.id}`}>Edit</Link>
+                  </td>
+                ) : null}
               </tr>
             ))
           )}
@@ -112,12 +138,13 @@ export default function OrganizationsIndex() {
       </table>
 
       <div style={{ marginTop: 16, display: "flex", gap: 8, alignItems: "center" }}>
-        <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        <button type="button" className="btn btn-sm btn-outline-secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
           Prev
         </button>
         <span>Page {page} · Total {total}</span>
         <button
           type="button"
+          className="btn btn-sm btn-outline-secondary"
           disabled={page * LIMIT_PER_PAGE >= total}
           onClick={() => setPage((p) => p + 1)}
         >

@@ -5,6 +5,7 @@ function resourceRoute(router, { prefix, permission, controller, middleware = []
   const c = controller;
   prefix = prefix.replace(/^\/+/, '');
   if (typeof c.index === "function") router.post(`/${prefix}/index`, ...middleware, ...(p ? [adminPermission(`${p}.view`)] : []), c.index);
+  if (typeof c.view === "function") router.post(`/${prefix}/view`, ...middleware, ...(p ? [adminPermission(`${p}.view`)] : []), c.view);
   if (typeof c.add === "function") router.post(`/${prefix}/add`, ...middleware, ...(p ? [adminPermission(`${p}.create`)] : []), c.add);
   if (typeof c.edit === "function") router.post(`/${prefix}/edit`, ...middleware, ...(p ? [adminPermission(`${p}.update`)] : []), c.edit);
   if (typeof c.softDelete === "function") router.post(`/${prefix}/delete`, ...middleware, ...(p ? [adminPermission(`${p}.delete`)] : []), c.softDelete);
